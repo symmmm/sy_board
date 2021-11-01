@@ -57,13 +57,13 @@ function LoginPage() {
   };
 
   const logout = () => {
-    axios.get(LOGIN_URI + "/rest/logout").then((response) => {
-      if (response.data.logout_result_code === 1) {
-        sessionStorage.clear();
-        dispatch(logoutButton());
-        history.push("/");
-      }
-    });
+    sessionStorage.clear();
+    history.push("/");
+    dispatch(logoutButton());
+  };
+
+  const home = () => {
+    history.push("/main");
   };
 
   const onKeyPress = (e) => {
@@ -83,10 +83,11 @@ function LoginPage() {
       }}
     >
       {sessionStorage.getItem("user_Token") ? (
-        <div>
+        <div style={{ textAlign: "center" }}>
           이미 로그인되어 있습니다.
           <br></br>
           <Button onClick={logout}>로그아웃하기</Button>
+          <Button onClick={home}>홈으로 돌아가기</Button>
         </div>
       ) : (
         <div className="loginBox">

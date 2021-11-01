@@ -19,7 +19,7 @@ const { Search } = Input;
 
 const PostList = () => {
   const search_ref = useRef();
-  const nowid = useParams();
+  //const nowid = useParams();
   const history = useHistory();
   const dispatch = useDispatch();
   const [data, setData] = useState([]);
@@ -119,15 +119,7 @@ const PostList = () => {
     return () => {
       console.log("리스트 언마운트");
     };
-  }, [
-    nowid,
-    searchValue,
-    LikeCount,
-    commentCount,
-    Best_List,
-    Reduxpage,
-    pagenowid,
-  ]);
+  }, [searchValue, LikeCount, commentCount, Best_List, Reduxpage, pagenowid]);
 
   //////////////////////페이지 변경 ///////////////////
   const PageHandeler = (page) => {

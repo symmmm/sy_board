@@ -41,14 +41,11 @@ const AppNavbar = () => {
   };
 
   //////////////////로그아웃/////////////
+
   const logout = () => {
-    axios.get(SERVER_URI + "/logout").then((response) => {
-      if (response.data.logout_result_code === 1) {
-        sessionStorage.clear();
-        dispatch(logoutButton());
-        history.push("/");
-      }
-    });
+    sessionStorage.clear();
+    history.push("/");
+    dispatch(logoutButton());
   };
   return (
     <div style={{ backgroundColor: "#343a40" }}>
