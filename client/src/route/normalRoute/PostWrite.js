@@ -30,14 +30,11 @@ function PostWrite() {
   const image_upload_click = () => fileRef.current.click();
 
   const imageHandler = (event) => {
-    console.log("실행");
     setloading(true);
     const file = event.target.files; // 데이터 만들어준다.
     const formData = new FormData();
-    Object.values(file).forEach((file) => formData.append("imgs", file));
-    //formData.append("imgs", file); // formData는 키-밸류 구조
+    Object.values(file).forEach((file) => formData.append("imgs", file)); //formData.append("imgs", file); // formData는 키-밸류 구조
     formData.append("path", "community/board"); //path도 formdata에 넣어준다
-    // 백엔드 multer라우터에 이미지를 보낸다.
     axios
       .post(IMAGE_URI, formData, {
         headers: {
@@ -45,16 +42,21 @@ function PostWrite() {
         },
       })
       .then((response) => {
-        //console.log("성공 시, 백엔드가 보내주는 데이터", response.data.images);
-        const IMG_URL = response.data.images;
-        //console.log("배열이미지", IMG_URL.length);
-        const editor = quillRef.current.getEditor(); // 에디터 객체 가져오기
-        const range = editor.getSelection();
-        for (var i = 0; i < IMG_URL.length; i++) {
-          if (IMG_URL[i]) {
-            editor.insertEmbed(range, "image", IMG_URL[i].imgurl);
-            //console.log("이미지삽입실행", IMG_URL[i].imgurl);
+        console.log(response.data.code);
+        if (response.data.code === "200") {
+          //console.log("성공 시, 백엔드가 보내주는 데이터", response.data.images);
+          const IMG_URL = response.data.images;
+          ////console.log("배열이미지", IMG_URL.length);
+          const editor = quillRef.current.getEditor(); // 에디터 객체 가져오기
+          const range = editor.getSelection();
+          for (var i = 0; i < IMG_URL.length; i++) {
+            if (IMG_URL[i]) {
+              editor.insertEmbed(range, "image", IMG_URL[i].imgurl);
+              ////console.log("이미지삽입실행", IMG_URL[i].imgurl);
+            }
           }
+        } else if (response.data.code === "999") {
+          alert("사진 업로드 실패");
         }
         setloading(false);
         event.target.value = "";

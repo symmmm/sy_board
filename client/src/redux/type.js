@@ -11,6 +11,8 @@ export const DELETE_NOWID = "DELETE_NOWID";
 export const UPDATE_COMMENT_COUNT = "UPDATE_COMMENT_COUNT";
 /////////디테일 리스트 추천 갯수 업데이트
 export const UPDATE_LIKE_COUNT = "UPDATE_LIKE_COUNT";
+/////////디테일 조회수 업데이트
+export const UPDATE_POST_COUNT = "UPDATE_POST_COUNT";
 //////
 export const UPDATE_PAGE = "UPDATE_PAGE";
 //////

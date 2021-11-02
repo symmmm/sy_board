@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import axios from "axios";
-import { Link, useParams, useHistory } from "react-router-dom";
+import { Link, useHistory, useParams } from "react-router-dom";
 import { Table } from "reactstrap";
 import { Menu, Dropdown, Button, Pagination, Input } from "antd";
 import { DownOutlined } from "@ant-design/icons";
@@ -16,10 +16,11 @@ import dayjs from "dayjs";
 import config from "../../config/index";
 const { SERVER_URI } = config;
 const { Search } = Input;
+//import { nowpaging } from "../../redux/reducers/NowpageReducer";
 
 const PostList = () => {
+  const nowid = useParams();
   const search_ref = useRef();
-  //const nowid = useParams();
   const history = useHistory();
   const dispatch = useDispatch();
   const [data, setData] = useState([]);
@@ -27,7 +28,6 @@ const PostList = () => {
   const [getMenu, setMenu] = useState("제목");
   const [interest, set_interest] = useState("");
   const [interest_total, set_interest_total] = useState("");
-
   const { SearchList, SelectMenu, searchValue, Reduxpage, Best_List } =
     useSelector(
       (state) => ({
@@ -39,18 +39,24 @@ const PostList = () => {
       }),
       shallowEqual
     );
-  const pagenowid = useSelector((state) => state.NowReducer);
-  const commentCount = useSelector(
-    (state) => state.BoardCountReducer.CommentCount
+  //const pagenowid = useSelector((state) => state.NowReducer.pagenowid);
+  const { commentCount, postCount } = useSelector(
+    (state) => ({
+      commentCount: state.BoardCountReducer.CommentCount,
+      postCount: state.BoardCountReducer.postCount,
+    }),
+    shallowEqual
   );
+  //console.log(postCount);
   const { LikeCount } = useSelector(
     (state) => state.LikeCountReducer,
     shallowEqual
   );
-  ////console.log(Best_List)
+  //////console.log(Best_List)
+
   ////////////////리스트 받아오기///////////////////
   useEffect(() => {
-    //console.log("이펙트실행");
+    console.log("이펙트실행");
     if (SearchList) {
       axios
         .get(
@@ -63,7 +69,7 @@ const PostList = () => {
             Reduxpage
         )
         .then((response) => {
-          console.log("검색or관심종목클릭");
+          //console.log("검색or관심종목클릭");
           setData(response.data.docs);
           setpageTotal(response.data.totalDocs);
           const fin_list_code = response.data.docs.map(
@@ -101,6 +107,7 @@ const PostList = () => {
     } else {
       axios.get(SERVER_URI + "/board/list/" + Reduxpage).then((response) => {
         setData(response.data.docs);
+        //console.log(response.data.docs);
         setpageTotal(response.data.totalDocs);
         const fin_list_code = response.data.docs.map(
           (v) => v.post_fin_list.code
@@ -116,10 +123,8 @@ const PostList = () => {
           });
       });
     }
-    return () => {
-      console.log("리스트 언마운트");
-    };
-  }, [searchValue, LikeCount, commentCount, Best_List, Reduxpage, pagenowid]);
+    return () => {};
+  }, [searchValue, LikeCount, commentCount, Best_List, Reduxpage, postCount]);
 
   //////////////////////페이지 변경 ///////////////////
   const PageHandeler = (page) => {
@@ -136,14 +141,14 @@ const PostList = () => {
             page
         )
         .then((response) => {
-          //console.log(page);
+          ////console.log(page);
           setpageTotal(response.data.totalDocs);
           setData(response.data.docs);
           //setPage(page);
         });
     } else {
       axios.get(SERVER_URI + "/board/list/" + page).then((response) => {
-        ////console.log(response.data);
+        //////console.log(response.data);
         setpageTotal(response.data.totalDocs);
         setData(response.data.docs);
         //setPage(page);
@@ -154,7 +159,7 @@ const PostList = () => {
   // useEffect(() => {
   //   const params = new URLSearchParams(window.location.search);
   //   const getParamsPage = params.get("page");
-  //   //console.log(getParamsPage)
+  //   ////console.log(getParamsPage)
   //   if (getParamsPage) {
   //     //setPage(parseInt(getParamsPage));
   //     PageHandeler(parseInt(getParamsPage))
@@ -178,24 +183,19 @@ const PostList = () => {
       dispatch(DeleteSearch());
     }
   };
-  /////////////홈으로갑시다////////////
+
+  ////////////////홈버튼
   const HomeButton = () => {
-    axios.get(SERVER_URI + "/board/list/1").then((response) => {
-      ////console.log(response.data.docs);
-      dispatch(DeletNoWid());
-      dispatch(DeleteSearch());
-      setpageTotal(response.data.totalDocs);
-      setData(response.data.docs);
-      setMenu("제목");
-      search_ref.current.state.value = "";
-      history.push("/main");
-      window.scrollTo(0, 0);
-    });
+    dispatch(DeletNoWid());
+    dispatch(DeleteSearch());
+    setMenu("제목");
+    search_ref.current.state.value = "";
+    history.push("/main");
+    window.scrollTo(0, 0);
   };
 
   function handleMenuClick(e) {
     setMenu(e.key);
-    //console.log(e);
   }
   const menu = (
     <Menu onClick={handleMenuClick}>
@@ -211,7 +211,6 @@ const PostList = () => {
     set_click_auth(value);
   }
   function auth_MenuClick() {
-    //dispatch(pageupdate(1));
     dispatch(PageSearch("작성자", click_auth));
   }
   const auth_menu = (
@@ -256,7 +255,7 @@ const PostList = () => {
         <tbody>
           {data.map((user, index) => (
             <tr key={index}>
-              {pagenowid.pagenowid === user._id ? (
+              {nowid.id === user._id ? (
                 <td className="now">현재글</td>
               ) : (
                 <td>{user.post_num}</td>

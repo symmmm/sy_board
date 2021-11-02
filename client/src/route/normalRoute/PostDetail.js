@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { DeletNoWid } from "../../redux/reducers/NowpageReducer";
 import { DeleteSearch, fincode_update } from "../../redux/reducers/PageReducer";
 import { nowpaging } from "../../redux/reducers/NowpageReducer";
-import { nowCount } from "../../redux/reducers/CountReducer";
+import { nowCount, postCount } from "../../redux/reducers/CountReducer";
 import Like from "./Like";
 import Report from "../../components/Report";
 import config from "../../config/index";
@@ -24,11 +24,10 @@ const PostDetail = () => {
   const [C_DeleteID, set_C_DeleteID] = useState();
   const [CC_commentid, set_CC_commentid] = useState();
   const [CC_recommentid, set_CC_recommentid] = useState();
-  const board_id = useParams();
+  const nowid = useParams();
   const history = useHistory();
   const dispatch = useDispatch();
   //const pagenowid = useSelector((state) => state.NowReducer);
-
   /////////삭제모달///////////
   const showModal = () => {
     setIsModalVisible(true);
@@ -71,48 +70,45 @@ const PostDetail = () => {
   ///////삭제////////////////////////////////////////
   const submitDelete = () => {
     axios
-      .delete(SERVER_URI + "/board/" + board_id.id, {
+      .delete(SERVER_URI + "/board/" + nowid.id, {
         headers: { authorization: sessionStorage.getItem("user_Token") },
       })
       .then((response) => {
-        //console.log(response);
+        ////console.log(response);
         history.push("/main");
       });
   };
   /////// 페이지 내용 받아오기//////////////////////////////////////
-  //const LikeCount = useSelector((state) => state.LikeCountReducer);
   const { LikeCount } = useSelector((state) => state.LikeCountReducer);
-  const nowid = useParams();
   const [data, setData] = useState({});
   const [Cdata, setCdata] = useState([]);
   const [titlecode, settitlecode] = useState("");
-
   useEffect(() => {
     axios.get(SERVER_URI + "/board/view/" + nowid.id).then((response) => {
-      ////console.log(response.data.list.post_author);
       settitlecode(response.data.list.post_fin_list);
-      dispatch(fincode_update(response.data.list.post_fin_list.name));
       setCdata(response.data.list.post_comment);
       setData(response.data.list);
-      //setUserCheck(false);
-      dispatch(nowpaging(nowid.id));
       window.scrollTo(0, 0);
+      //console.log(response.data.list.post_count);
+      //dispatch(nowpaging(nowid.id));
+      dispatch(postCount(response.data.list.post_count));
+      dispatch(fincode_update(response.data.list.post_fin_list.name));
     });
     return () => {
-      //console.log("상세페이지 언마운트");
-      dispatch(DeletNoWid());
+      //console.log("리스트 언마운트");
+      dispatch(fincode_update());
+      //dispatch(nowpaging());
     };
   }, [nowid]);
-
   /////리덕스이용해서 추천수올리기
-
   useEffect(() => {
     axios
       .get(SERVER_URI + "/board/view/update/" + nowid.id)
       .then((response) => {
         setData(response.data.list);
-        ////console.log("좋아요 갯수",response.data.list.post_recommend)
-        //console.log("좋아요 갯수 업데이트");
+        //console.log(response.data.list.post_count);
+        //////console.log("좋아요 갯수",response.data.list.post_recommend)
+        ////console.log("좋아요 갯수 업데이트");
       });
   }, [LikeCount]);
 
@@ -120,7 +116,7 @@ const PostDetail = () => {
   const [UserName, setUserName] = useState("");
   useEffect(() => {
     axios.get(SERVER_URI + "/user_check").then((response) => {
-      ////console.log(response.data.userName)
+      //////console.log(response.data.userName)
       setUserName(response.data.userName);
     });
   }, [nowid]);
@@ -137,13 +133,13 @@ const PostDetail = () => {
           comment_content: WriteComment,
         })
         .then(() => {
-          ////console.log(response.data);
+          //////console.log(response.data);
           setWriteComment("");
           dispatch(nowCount(Cdata.length));
           axios
             .get(SERVER_URI + "/board/view/update/" + nowid.id)
             .then((response) => {
-              ////console.log(response.data.list);
+              //////console.log(response.data.list);
               setCdata(response.data.list.post_comment);
               alert("댓글 작성 완료");
             });
@@ -165,7 +161,7 @@ const PostDetail = () => {
           axios
             .get(SERVER_URI + "/board/view/update/" + nowid.id)
             .then((response) => {
-              //console.log(response.data.list);
+              ////console.log(response.data.list);
               setCdata(response.data.list.post_comment);
             });
           alert("답글 작성 완료");
@@ -180,7 +176,7 @@ const PostDetail = () => {
         headers: { authorization: sessionStorage.getItem("user_Token") },
       })
       .then(() => {
-        //console.log(response);
+        ////console.log(response);
         dispatch(nowCount(Cdata.length));
         axios
           .get(SERVER_URI + "/board/view/update/" + nowid.id)
@@ -217,7 +213,7 @@ const PostDetail = () => {
   };
   const CommentHandler = (e) => {
     setWriteComment(e.target.value);
-    ////console.log(e.target.value);
+    //////console.log(e.target.value);
   };
   /////////////////////////////홈으로 갑시다/////////
   const HomeButton = () => {
@@ -311,7 +307,7 @@ const PostDetail = () => {
             report_title={data.post_title} //제목
             bad_user={data.post_author} //신고유저
             report_user={UserName} //신고자
-            board_id={board_id.id} //게시글아이디
+            board_id={nowid.id} //게시글아이디
           />
         )}
       </div>
