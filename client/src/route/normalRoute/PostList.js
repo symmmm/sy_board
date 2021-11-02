@@ -50,7 +50,7 @@ const PostList = () => {
   ////console.log(Best_List)
   ////////////////리스트 받아오기///////////////////
   useEffect(() => {
-    console.log("이펙트실행");
+    //console.log("이펙트실행");
     if (SearchList) {
       axios
         .get(
