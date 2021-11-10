@@ -13,6 +13,7 @@ const Chart = () => {
     (state) => state.PageSearchReducer.fincode
   );
   useEffect(() => {
+    console.log("차트실행");
     axios
       .post(SERVER_URI + "/board/chart", {
         fin_name: fincode_redux_data,
@@ -21,6 +22,10 @@ const Chart = () => {
         //console.log(response.data.chart_data);
         settdata(response.data.chart_data);
       });
+    return () => {
+      //console.log("클린업");
+      settdata([]);
+    };
   }, [fincode_redux_data]);
 
   /////////////

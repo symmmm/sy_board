@@ -23,7 +23,7 @@ function PostEdit() {
   const image_upload_click = () => fileRef.current.click();
 
   const imageHandler = (event) => {
-    console.log("실행");
+    //console.log("실행");
     setloading(true);
     const file = event.target.files; // 데이터 만들어준다.
     const formData = new FormData();
@@ -38,15 +38,15 @@ function PostEdit() {
         },
       })
       .then((response) => {
-        //console.log("성공 시, 백엔드가 보내주는 데이터", response.data.images);
+        ////console.log("성공 시, 백엔드가 보내주는 데이터", response.data.images);
         const IMG_URL = response.data.images;
-        //console.log("배열이미지", IMG_URL.length);
+        ////console.log("배열이미지", IMG_URL.length);
         const editor = quillRef.current.getEditor(); // 에디터 객체 가져오기
         const range = editor.getSelection();
         for (var i = 0; i < IMG_URL.length; i++) {
           if (IMG_URL[i]) {
             editor.insertEmbed(range, "image", IMG_URL[i].imgurl);
-            //console.log("이미지삽입실행", IMG_URL[i].imgurl);
+            ////console.log("이미지삽입실행", IMG_URL[i].imgurl);
           }
         }
         setloading(false);
@@ -116,7 +116,7 @@ function PostEdit() {
   const [Codedata, setCodeData] = useState([]);
   useEffect(() => {
     axios.get(FINCODE_URI).then((response) => {
-      //console.log(response.data.datalist);
+      ////console.log(response.data.datalist);
       const CodeList = response.data.datalist;
       setCodeData(CodeList);
     });
@@ -132,7 +132,7 @@ function PostEdit() {
 
   useEffect(() => {
     axios.get(SERVER_URI + "/board/view/" + board_id.id).then((response) => {
-      //console.log("가져올때", response.data.list.post_content);
+      ////console.log("가져올때", response.data.list.post_content);
       setOrigintitle(response.data.list.post_title);
       setOriginCode(response.data.list.post_fin_list);
       setOrigincontent(response.data.list.post_content);
@@ -217,12 +217,22 @@ function PostEdit() {
           style={{ visibility: "hidden" }}
         />
       </div>
-      <div className="detail_button_wrap">
-        <Button type="primary" onClick={submitReview}>
+      <div className="edit_button_wrap">
+        <Button
+          style={{
+            marginLeft: "1px",
+            borderRadius: "2em",
+            color: "rgba(236, 106, 23)",
+          }}
+          onClick={submitReview}
+        >
           수정
         </Button>
 
-        <Button type="primary" onClick={Back} style={{ marginLeft: "1px" }}>
+        <Button
+          onClick={Back}
+          style={{ marginLeft: "1px", borderRadius: "2em" }}
+        >
           취소
         </Button>
       </div>

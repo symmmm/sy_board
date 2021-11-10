@@ -25,7 +25,7 @@ const MyPage = () => {
       .then((response) => {
         setmyData(response.data.docs);
         setpageTotal(response.data.totalDocs);
-        //console.log(response.data.totalDocs);
+        ////console.log(response.data.totalDocs);
       });
   }, [UserName]);
 
@@ -35,7 +35,7 @@ const MyPage = () => {
       .then((response) => {
         setmyData(response.data.docs);
         setpageTotal(response.data.totalDocs);
-        //console.log(response.data.totalDocs);
+        ////console.log(response.data.totalDocs);
       });
   };
   return (
@@ -80,10 +80,18 @@ const MyPage = () => {
         </tbody>
       </Table>
       <div className="page_box">
-        <Button onClick={back}>돌아가기</Button>
-        <Pagination total={pageTotal} onChange={PageHandeler} />
+        <Button style={{ borderRadius: "2em" }} onClick={back}>
+          돌아가기
+        </Button>
+        <Pagination
+          total={pageTotal}
+          onChange={PageHandeler}
+          showSizeChanger={false}
+        />
         <Link to="/posts" className="text-white text-decoration-none">
-          <Button type="primary">글 작성</Button>
+          <Button style={{ borderRadius: "2em", color: "rgba(236, 106, 23)" }}>
+            글 작성
+          </Button>
         </Link>
       </div>
       <br></br>

@@ -1,12 +1,13 @@
-import { LikeFilled } from "@ant-design/icons";
+import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
+import FavoriteIcon from "@material-ui/icons/Favorite";
 import React from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { nowLIKECount } from "../../redux/reducers/commentCount";
-import { Button } from "antd";
 import config from "../../config/index";
+//import { Button } from "antd";
 const { SERVER_URI } = config;
 
 const Like = () => {
@@ -18,7 +19,7 @@ const Like = () => {
     axios
       .get(SERVER_URI + "/board/view/recommend/" + nowid.id)
       .then((response) => {
-        ////console.log(response.data.recommend_count);
+        //////console.log(response.data.recommend_count);
         SET_LIKE_COUNT(response.data.recommend_count);
         dispatch(nowLIKECount(response.data.recommend_count));
         if (like === -1) {
@@ -33,7 +34,7 @@ const Like = () => {
   useEffect(() => {
     axios.get(SERVER_URI + "/user_check").then((response) => {
       setNickname(response.data.userName);
-      ////console.log(response.data.userName);
+      //////console.log(response.data.userName);
     });
   }, [nowid]);
 
@@ -44,14 +45,14 @@ const Like = () => {
     axios
       .get(SERVER_URI + "/board/view/update/" + nowid.id)
       .then((response) => {
-        ////console.log(response.data.list.post_recommend_user)
+        //////console.log(response.data.list.post_recommend_user)
         SET_LIKE_COUNT(response.data.list.post_recommend);
         const index = response.data.list.post_recommend_user.findIndex(
           (aaa) => aaa.recommend_user === Nickname
         );
 
         setlike(index);
-        ////console.log("추천확인 -1이면 안누름", index);
+        //////console.log("추천확인 -1이면 안누름", index);
       });
   }, [nowid, LikeCount, Nickname]);
 
@@ -59,13 +60,24 @@ const Like = () => {
     <>
       <div className="like">
         {like === -1 ? (
-          <Button className="BigLike" onClick={likeclick}>
-            <LikeFilled className="likeicon" />:{LIKE_COUNT}
-          </Button>
+          <div className="like_button">
+            {" "}
+            <FavoriteBorderIcon
+              className="likeicon"
+              onClick={likeclick}
+              style={{ fontSize: "30px" }}
+            />
+            <span className="Like_count">{LIKE_COUNT}</span>
+          </div>
         ) : (
-          <Button className="BigLike" onClick={likeclick}>
-            <LikeFilled className="onlikeicon" />:{LIKE_COUNT}
-          </Button>
+          <div className="like_button">
+            <FavoriteIcon
+              className="onlikeicon"
+              onClick={likeclick}
+              style={{ fontSize: "30px" }}
+            />
+            <span className="Like_count">{LIKE_COUNT}</span>
+          </div>
         )}
       </div>
       <div></div>

@@ -1,4 +1,9 @@
 @import "~antd/dist/antd.css";
+@import url(https://fonts.googleapis.com/earlyaccess/notosanskr.css);
+
+div {
+  font-family: "Noto Sans KR" !important;
+}
 
 th,
 td {
@@ -79,6 +84,12 @@ body {
   flex-direction: row;
   justify-content: space-between;
 }
+.favorite_btn_wrap {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 250px;
+}
 .loginButton {
   color: white;
 }
@@ -88,9 +99,16 @@ body {
   width: 1300px;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+}
+.edit_button_wrap {
+  margin: 0 auto;
+  margin-bottom: 20px;
+  width: 1300px;
+  display: flex;
+  flex-direction: row;
   justify-content: flex-end;
 }
-
 .detail {
   width: 1200px;
   padding: 5px;
@@ -113,9 +131,7 @@ body {
 }
 .favorite_list {
   word-break: break-all;
-  border-color: black;
-  border-style: solid;
-  border-width: thin;
+  border: 1px solid #dadada;
   height: auto;
   box-sizing: border-box;
   overflow-y: auto;
@@ -124,6 +140,7 @@ body {
   width: 250px;
   background-color: #f5f0f0;
   margin-top: 5px;
+  margin-bottom: 5px;
 }
 .Commentsbody {
   text-align: left;
@@ -135,24 +152,29 @@ body {
   border-style: solid;
   border-width: thin;
   width: 250px;
+  margin-top: 5px;
 }
 
 .vote-inline-graph {
   height: 32px;
   line-height: 32px;
   display: inline-block;
+  color: #fff;
+  font-weight: 500;
 }
 
 .vote-inline-graph.up {
-  background-color: rgba(255, 0, 0, 0.5);
+  background-color: rgba(236, 106, 23);
   max-width: 90%;
   min-width: 10%;
+  font-size: 8px;
 }
 
 .vote-inline-graph.down {
-  background-color: rgba(0, 0, 255, 0.5);
+  background-color: rgba(27, 33, 47);
   max-width: 90%;
   min-width: 10%;
+  font-size: 8px;
 }
 
 .warning {
@@ -163,6 +185,9 @@ body {
   height: 40px;
   margin-top: 10px;
   margin-bottom: 10px;
+}
+.title:hover {
+  border-color: rgba(236, 106, 23);
 }
 .commentbox {
   height: 100px;
@@ -199,12 +224,27 @@ body {
 .titledivider {
   margin: inherit;
 }
+.divider {
+  margin: 8px 0;
+}
 .likeicon {
-  font-size: 30px;
+  color: rgba(236, 106, 23);
 }
 .onlikeicon {
-  font-size: 30px;
-  color: red;
+  color: rgba(236, 106, 23);
+}
+.Like_count {
+  margin-left: 2px;
+  padding-bottom: 3px;
+  font-size: 22px;
+  font-weight: 300;
+}
+.like_button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
 }
 .like {
   display: flex;
@@ -212,6 +252,7 @@ body {
   justify-content: space-around;
   width: auto;
   height: auto;
+  margin-left: 10px;
 }
 
 .recommenttable {
@@ -243,7 +284,7 @@ body {
 }
 .favorite {
   width: 270px;
-  padding-left: 15px;
+  margin-left: 20px;
   text-align: center;
 }
 
@@ -254,22 +295,64 @@ body {
   margin: 0 auto;
 }
 
-.page-header {
-  border: 1px solid #444444;
-  height: 150px;
-  background: orange;
-  padding-top: 55px;
-  margin-bottom: 30px;
-}
-.header-text {
-  background-color: orange;
+.header-wrap {
+  background-color: white;
   width: 1300px;
-  height: 90px;
+  height: 98px;
   margin: 0 auto;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+  flex-direction: row;
+}
+.image_box {
+  width: 198px;
+  height: 98px;
+  padding-top: 14px;
+}
+.login_box {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 360px;
+}
+.login_wrap {
+  margin-top: 13px;
+  width: 410px;
+  height: 30px;
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #dadada;
+  font-size: 13px;
+}
+.login_1 {
+  width: 190px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.logout_btn {
+  border: 0;
+  background-color: #ff6d00;
+  color: #fff;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: -1px;
+  cursor: pointer;
+}
+.logout_btn:last-child {
+  width: 92px;
+  background-color: #381e1f;
 }
 
+.login_image {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 27px;
+  height: 28px;
+  background-color: #eee;
+  margin-right: 5px;
+}
 .footer {
   display: flex;
   justify-content: center;
@@ -289,6 +372,7 @@ body {
 .ql-tooltip {
   left: 400px !important;
   top: -50px !important;
+  margin: 0 !important;
 }
 .ql-editor .ql-video {
   display: block;
@@ -336,4 +420,199 @@ body {
 }
 #red {
   color: red;
+}
+.Topbanner {
+  height: 120px;
+  background-color: black;
+}
+.close {
+  width: 40px;
+  height: 40px;
+  background-color: red;
+}
+
+.outer {
+  position: relative;
+  margin: auto;
+  width: 70px;
+  cursor: pointer;
+}
+
+.inner {
+  width: inherit;
+  text-align: center;
+}
+
+.label {
+  font-size: 0.8em;
+  line-height: 4em;
+  text-transform: uppercase;
+  color: #fff;
+  transition: all 0.3s ease-in;
+  opacity: 0;
+  cursor: pointer;
+}
+.topbanner_image {
+  position: relative;
+}
+.Topbanner > a {
+  display: block;
+  font-size: 0;
+  cursor: pointer;
+}
+.topbanner_image .close_button {
+  position: absolute;
+  right: 4px;
+  z-index: 2;
+  margin-top: 35px;
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  background: url("../src/img/icon-close-white.png") no-repeat center center;
+  background-size: 50% auto;
+}
+.close_button:hover {
+  background-color: #fff;
+  background-image: url("../src/img/icon-close.png");
+}
+
+.ant-btn-primary {
+  background: white;
+  color: black;
+}
+.ant-input-search
+  > .ant-input-group
+  > .ant-input-group-addon:last-child
+  .ant-input-search-button {
+  padding-top: 0;
+  padding-bottom: 5px;
+  border-color: #d9d9d9;
+}
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  color: #40a9ff;
+  border-color: #40a9ff;
+  background-color: white;
+}
+.ant-btn:hover,
+.ant-btn:focus {
+  color: rgba(236, 106, 23);
+  background: #fff;
+  border-color: rgba(236, 106, 23);
+}
+.ant-pagination-item-active {
+  font-weight: 500;
+  background: #fff;
+  border-color: rgba(236, 106, 23);
+}
+.ant-input:focus,
+.ant-input-focused {
+  border-color: orange;
+  border-right-width: 1 px !important;
+  outline: 0;
+  box-shadow: 0 !important;
+}
+.ant-input-search .ant-input:hover,
+.ant-input-search .ant-input:focus {
+  border-color: rgba(236, 106, 23);
+}
+.my_list {
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.my_list:hover {
+  font-weight: 600;
+}
+.commnet_count {
+  margin-left: 7px;
+  color: blue;
+  font-weight: 600;
+}
+.comment_box {
+  margin-top: 5px;
+  margin-left: 7px;
+  margin-bottom: 15px;
+  border-top: 1px solid #dadada;
+}
+.comment_wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+.comment_delete {
+  font-size: 12px;
+  margin-left: 3px;
+}
+.report_btn {
+  color: red;
+  margin-left: 5px;
+}
+.recomment_box {
+  border-top: 1px solid #dadada;
+  padding-top: 6px;
+}
+.event_box {
+  width: 340px;
+}
+.news_top {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 15px;
+  font-weight: bold;
+  margin-top: 10px;
+  border-bottom: 1px solid #dadada;
+}
+.animated-text {
+  margin-left: 3px;
+  height: 60px;
+  overflow: hidden;
+}
+.news {
+  z-index: 100;
+  margin-left: 3px;
+  background: white;
+  border-left: 1px solid #dadada;
+  border-bottom: 1px solid #dadada;
+  border-right: 1px solid #dadada;
+}
+.line {
+  text-align: start;
+  font-size: 13px;
+  width: 317px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.line2 {
+  text-align: start;
+  font-size: 13px;
+  width: 317px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.line:first-child {
+  animation: anim 12s infinite;
+}
+
+@keyframes anim {
+  48% {
+    margin-top: 0px;
+  }
+  50% {
+    margin-top: -40px;
+  }
+  98% {
+    margin-top: -40px;
+  }
+  100% {
+    margin-top: 0px;
+  }
 }

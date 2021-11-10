@@ -31,7 +31,7 @@ const Favorite = React.memo(() => {
 
   const onCodeHandler = (event, newValue) => {
     setCodeInput(newValue);
-    ////console.log(newValue);
+    //////console.log(newValue);
   };
 
   ////////관심종목 추가, 삭제/////////
@@ -46,7 +46,7 @@ const Favorite = React.memo(() => {
           alert("이미 관심종목 리스트에 추가되어있습니다.");
         } else {
           axios.get(SERVER_URI + "/fin_interest/view").then((response) => {
-            //console.log(response.data.fin_interest_data);
+            ////console.log(response.data.fin_interest_data);
             setMycode(response.data.fin_interest_data);
           });
         }
@@ -60,11 +60,11 @@ const Favorite = React.memo(() => {
       })
       .then(() => {
         axios.get(SERVER_URI + "/fin_interest/view").then((response) => {
-          //console.log(response.data.fin_interest_data);
+          ////console.log(response.data.fin_interest_data);
           setMycode(response.data.fin_interest_data);
         });
       });
-    //console.log(code);
+    ////console.log(code);
   };
   ////////////종목 누르면 리스트 바꾸기/////////////////
   const [total_UPpercent, set_total_UPpercent] = useState("");
@@ -74,7 +74,7 @@ const Favorite = React.memo(() => {
   );
 
   const finList_Button = (finname) => {
-    ////console.log(finname);
+    //////console.log(finname);
     //setcheck_code(finname);
     dispatch(PageSearch("종목명", finname));
     dispatch(fincode_update(finname));
@@ -84,8 +84,8 @@ const Favorite = React.memo(() => {
   const [check, setcheck] = useState("");
   const [minus_check, minus_setcheck] = useState("");
   useEffect(() => {
-    //console.log("data", fincode_redux_data);
-    //console.log("이펙트실행");
+    ////console.log("data", fincode_redux_data);
+    ////console.log("이펙트실행");
     axios
       .post(SERVER_URI + "/finance/info", {
         finance_name: fincode_redux_data,
@@ -94,19 +94,19 @@ const Favorite = React.memo(() => {
         const header = window.sessionStorage.getItem("user_Token");
         const array = header.split(".");
         const userName = JSON.parse(Base64.decode(array[1])).userName;
-        //console.log(userName);
+        ////console.log(userName);
 
         if (fincode_redux_data) {
           const index = response.data.finance_Up_Count_User;
           const index_check = index.findIndex((g) => g === userName);
           setcheck(index_check);
-          //console.log("투표확인 안했으면 -1 ", index_check);
+          ////console.log("투표확인 안했으면 -1 ", index_check);
           const minus_index = response.data.finance_Down_Count_User;
           const minus_index_check = minus_index.findIndex(
             (h) => h === userName
           );
           minus_setcheck(minus_index_check);
-          //console.log("하락 투표확인 안했으면 -1 ", minus_index_check);
+          ////console.log("하락 투표확인 안했으면 -1 ", minus_index_check);
         }
 
         set_total_UPpercent(
@@ -132,7 +132,7 @@ const Favorite = React.memo(() => {
       minus_setcheck("");
       set_total_Downpercent("");
       set_total_UPpercent("");
-      ////console.log("리스트 언마운트");
+      //////console.log("리스트 언마운트");
     };
   }, [fincode_redux_data]);
 
@@ -182,7 +182,7 @@ const Favorite = React.memo(() => {
             finance_name: fincode_redux_data,
           })
           .then((response) => {
-            ////console.log(response.data.finance_Down_Count);
+            //////console.log(response.data.finance_Down_Count);
             set_total_UPpercent(
               Math.round(
                 (response.data.finance_Up_Count /
@@ -224,8 +224,8 @@ const Favorite = React.memo(() => {
           style={{ width: 250 }}
           renderInput={(params) => (
             <TextField
-              {...params}
               label="관심종목을 선택하세요"
+              {...params}
               margin="normal"
             />
           )}
@@ -248,15 +248,14 @@ const Favorite = React.memo(() => {
           {MyCode.map((aaa, index) => {
             return (
               <div key={index}>
-                <div>
+                <div className="my_list">
                   <span
                     onClick={() => {
                       finList_Button(aaa.name);
                     }}
                   >
-                    {aaa.name}
+                    {aaa.name}ㅣ{aaa.code}{" "}
                   </span>
-                  ㅣ{aaa.code}{" "}
                   <CloseOutlined
                     onClick={() => {
                       Delete_Button(aaa.code);
@@ -267,11 +266,12 @@ const Favorite = React.memo(() => {
             );
           })}
         </div>
-        <br></br>
-        <div>{fincode_redux_data}</div>
 
         {fincode_redux_data ? (
           <>
+            <div style={{ fontWeight: "600" }}>
+              종목명 : {fincode_redux_data}
+            </div>
             <div className="vote">
               <div
                 className="vote-inline-graph up"
@@ -286,14 +286,14 @@ const Favorite = React.memo(() => {
                 {total_Downpercent}%
               </div>
             </div>
-            <div className="page_box">
+            <div className="favorite_btn_wrap">
               {check === -1 ? (
-                <Button onClick={Up_Button}>상승</Button>
+                <Button onClick={Up_Button}>상승타이밍</Button>
               ) : (
                 <span></span>
               )}
               {minus_check === -1 ? (
-                <Button onClick={Down_Button}>하락</Button>
+                <Button onClick={Down_Button}>하락타이밍</Button>
               ) : (
                 <span></span>
               )}

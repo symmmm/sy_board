@@ -1,19 +1,157 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Modal } from "antd";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+import { useHistory } from "react-router-dom";
+import { logoutButton } from "../redux/reducers/ButtonReducer";
+import config from "../config/index";
+import logo from "../img/logo.png";
+import login_icon from "../img/icon-id.png";
+import Topbanner from "./Topbanner";
+import Event from "./Event";
+const { SERVER_URI } = config;
 
 const Header = () => {
+  const { logoutstate } = useSelector((state) => state.ButtonReducer);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [Nickname, setNickname] = useState("");
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+    logout();
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  useEffect(() => {
+    if (logoutstate) {
+      axios.get(SERVER_URI + "/user_check").then((response) => {
+        //console.log(response.data.userName);
+        setNickname(response.data.userName);
+      });
+    }
+  }, [logoutstate]);
+
+  const mypage = () => {
+    axios.get(SERVER_URI + "/user_check").then((response) => {
+      //console.log(response.data.userName);
+      const UserName = response.data.userName;
+      history.push({
+        pathname: "/mypage",
+        state: { username: UserName },
+      });
+      ////console.log("usercheck", UserName);
+    });
+  };
+
+  //////////////////로그아웃/////////////
+  const logout = () => {
+    sessionStorage.clear();
+    history.push("/");
+    dispatch(logoutButton());
+  };
+
   return (
-    <div
-      style={{
-        backgroundColor: "orange",
-        height: "150px",
-        marginBottom: "30px",
-        paddingTop: "55px",
-      }}
-    >
-      <div className="header-text">
-        <span style={{ fontSize: "35px", fontWeight: "bold" }}>
-          종목토론게시판
-        </span>
+    <div>
+      <Topbanner />
+      <div
+        style={{
+          backgroundColor: "white",
+          height: "100px",
+          marginBottom: "40px",
+          borderBottom: "1px solid #dadada",
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
+        <div className="header-wrap">
+          <div style={{ display: "flex" }}>
+            <div className="image_box" style={{ paddingTop: "9px" }}>
+              <a
+                href="https://www.suwon.ac.kr"
+                target="_blank"
+                rel="noreferrer noopenner"
+              >
+                <img alt="logo" src={logo}></img>
+              </a>
+            </div>
+          </div>
+          <Event />
+          <div style={{ display: "flex" }}>
+            <div className="login_box">
+              {logoutstate ? (
+                <div className="login_wrap">
+                  <span className="login_image">
+                    <img
+                      alt="login_icon"
+                      src={login_icon}
+                      style={{
+                        width: "15px",
+                        height: "15px",
+                        marginLeft: "5px",
+                      }}
+                    ></img>
+                  </span>
+                  <div className="login_1">{Nickname}님 환영합니다.</div>
+                  <button className="logout_btn" onClick={mypage}>
+                    MYpage
+                  </button>
+                  <button className="logout_btn" onClick={showModal}>
+                    로그아웃
+                  </button>
+                </div>
+              ) : (
+                "로그인이 필요한 서비스입니다"
+              )}
+            </div>
+            <div
+              className="image_box"
+              style={{
+                paddingTop: "14px",
+                zIndex: "10",
+                width: "180px",
+                position: "relative",
+                left: "25px",
+                backgroundColor: "grey",
+                border: "1px solid #444444",
+              }}
+            >
+              배너
+            </div>
+            <div
+              className="image_box"
+              style={{
+                paddingTop: "14px",
+                zIndex: "10",
+                width: "180px",
+                position: "relative",
+                left: "25px",
+                backgroundColor: "grey",
+                border: "1px solid #444444",
+              }}
+            >
+              배너
+            </div>
+          </div>
+        </div>
+        <Modal
+          title="로그아웃"
+          visible={isModalVisible}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          okText="로그아웃"
+          cancelText="취소"
+        >
+          <p>정말 로그아웃 하시겠습니까?</p>
+        </Modal>
       </div>
     </div>
   );

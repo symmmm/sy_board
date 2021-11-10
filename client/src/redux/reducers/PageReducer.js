@@ -25,8 +25,9 @@ export const fincode_update = (fincode) => ({
   payload: fincode,
 });
 
-export const update_best = () => ({
+export const update_best = (category) => ({
   type: BEST_LIST_UPDATE,
+  payload: category,
 });
 
 const initialState = {
@@ -71,7 +72,7 @@ const PageSearchReducer = (state = initialState, action) => {
     case BEST_LIST_UPDATE:
       return {
         ...state,
-        Best_List: true,
+        Best_List: action.payload,
       };
     default:
       return { ...state };

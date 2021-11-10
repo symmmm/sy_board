@@ -81,7 +81,9 @@ function PostWrite() {
   const [Title, setTitle] = useState();
 
   const submitReview = () => {
-    if (CodeInput && ContentData && Title) {
+    if (Title.length >= 16) {
+      alert("제목의 길이는 15글자 이하로 설정해주세요");
+    } else if (CodeInput && ContentData && Title) {
       axios
         .post(
           SERVER_URI + "/board/insert",
@@ -100,6 +102,8 @@ function PostWrite() {
             dispatch(DeletNoWid());
             dispatch(DeleteSearch());
             history.push("/main");
+          } else {
+            alert("오류");
           }
         });
     } else {
@@ -109,6 +113,7 @@ function PostWrite() {
 
   const TitleHandler = (e) => {
     setTitle(e.target.value);
+    console.log(e.target.value.length);
   };
 
   const onCodeHandler = (event, newValue) => {
@@ -198,7 +203,7 @@ function PostWrite() {
         <Input
           className="title"
           type="text"
-          placeholder="제목"
+          placeholder="제목을 입력해주세요"
           onChange={TitleHandler}
         />
         <p className="warning">
@@ -210,7 +215,7 @@ function PostWrite() {
             style={{ height: "450px" }}
             ref={quillRef}
             theme="snow"
-            placeholder="글을 작성해주세요"
+            placeholder="내용을 입력해주세요"
             value={ContentData}
             onChange={setContentData}
             modules={modules}
@@ -229,11 +234,21 @@ function PostWrite() {
           style={{ visibility: "hidden" }}
         />
       </div>
-      <div className="detail_button_wrap">
-        <Button type="primary" onClick={submitReview}>
+      <div className="edit_button_wrap">
+        <Button
+          style={{
+            marginLeft: "1px",
+            borderRadius: "2em",
+            color: "rgba(236, 106, 23)",
+          }}
+          onClick={submitReview}
+        >
           등록
         </Button>
-        <Button type="primary" onClick={Back} style={{ marginLeft: "1px" }}>
+        <Button
+          onClick={Back}
+          style={{ marginLeft: "1px", borderRadius: "2em" }}
+        >
           취소
         </Button>
       </div>

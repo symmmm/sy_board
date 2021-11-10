@@ -11,7 +11,7 @@ import {
   update_best,
   DeleteSearch,
 } from "../../redux/reducers/PageReducer";
-import { DeletNoWid } from "../../redux/reducers/NowpageReducer";
+//import { DeletNoWid } from "../../redux/reducers/NowpageReducer";
 import dayjs from "dayjs";
 import config from "../../config/index";
 const { SERVER_URI } = config;
@@ -47,12 +47,10 @@ const PostList = () => {
     }),
     shallowEqual
   );
-  //console.log(postCount);
   const { LikeCount } = useSelector(
     (state) => state.LikeCountReducer,
     shallowEqual
   );
-  //////console.log(Best_List)
 
   ////////////////리스트 받아오기///////////////////
   useEffect(() => {
@@ -65,7 +63,7 @@ const PostList = () => {
             SelectMenu +
             "/" +
             searchValue +
-            "/" +
+            "/0/0/" +
             Reduxpage
         )
         .then((response) => {
@@ -85,29 +83,70 @@ const PostList = () => {
               set_interest_total(res.data.countBoard[0]?.total_count);
             });
         });
-    } else if (Best_List === true) {
-      axios
-        .get(SERVER_URI + "/board/list/best/" + Reduxpage)
-        .then((response) => {
-          setData(response.data.docs);
-          setpageTotal(response.data.totalDocs);
-          const fin_list_code = response.data.docs.map(
-            (v) => v.post_fin_list.code
-          );
-          axios
-            .post(SERVER_URI + "/board/countBoard", {
-              fin_code_list: fin_list_code,
-            })
-            .then((res) => {
-              const int_v = res.data.countBoard.map((a) => a.fin_count);
-              set_interest(int_v);
-              set_interest_total(res.data.countBoard[0]?.total_count);
-            });
-        });
+    } else if (Best_List) {
+      if (Best_List === "추천수") {
+        console.log("추천수");
+        axios
+          .get(SERVER_URI + "/board/desc/like/" + Reduxpage)
+          .then((response) => {
+            setData(response.data.docs);
+            setpageTotal(response.data.totalDocs);
+            const fin_list_code = response.data.docs.map(
+              (v) => v.post_fin_list.code
+            );
+            axios
+              .post(SERVER_URI + "/board/countBoard", {
+                fin_code_list: fin_list_code,
+              })
+              .then((res) => {
+                const int_v = res.data.countBoard.map((a) => a.fin_count);
+                set_interest(int_v);
+                set_interest_total(res.data.countBoard[0]?.total_count);
+              });
+          });
+      } else if (Best_List === "조회수") {
+        console.log("조회수");
+        axios
+          .get(SERVER_URI + "/board/desc/view/" + Reduxpage)
+          .then((response) => {
+            setData(response.data.docs);
+            console.log(response.data.docs);
+            setpageTotal(response.data.totalDocs);
+            const fin_list_code = response.data.docs.map(
+              (v) => v.post_fin_list.code
+            );
+            axios
+              .post(SERVER_URI + "/board/countBoard", {
+                fin_code_list: fin_list_code,
+              })
+              .then((res) => {
+                const int_v = res.data.countBoard.map((a) => a.fin_count);
+                set_interest(int_v);
+                set_interest_total(res.data.countBoard[0]?.total_count);
+              });
+          });
+      } else if (Best_List === "인기종목") {
+        axios
+          .get(SERVER_URI + "/board/desc/attention/" + Reduxpage)
+          .then((response) => {
+            const array = response.data.boards.docs.map((a) => a.boards_object);
+            setData(array);
+            setpageTotal(response.data.boards?.totalDocs);
+            const fin_list_code = array.map((v) => v.post_fin_list.code);
+            axios
+              .post(SERVER_URI + "/board/countBoard", {
+                fin_code_list: fin_list_code,
+              })
+              .then((res) => {
+                const int_v = res.data.countBoard.map((a) => a.fin_count);
+                set_interest(int_v);
+                set_interest_total(res.data.countBoard[0]?.total_count);
+              });
+          });
+      }
     } else {
       axios.get(SERVER_URI + "/board/list/" + Reduxpage).then((response) => {
         setData(response.data.docs);
-        //console.log(response.data.docs);
         setpageTotal(response.data.totalDocs);
         const fin_list_code = response.data.docs.map(
           (v) => v.post_fin_list.code
@@ -137,7 +176,7 @@ const PostList = () => {
             SelectMenu +
             "/" +
             searchValue +
-            "/" +
+            "/0/0/" +
             page
         )
         .then((response) => {
@@ -171,7 +210,7 @@ const PostList = () => {
   const onSearch = (value) => {
     if (value) {
       axios
-        .get(SERVER_URI + "/board/search/" + getMenu + "/" + value + "/1")
+        .get(SERVER_URI + "/board/search/" + getMenu + "/" + value + "/0/0/1")
         .then((response) => {
           const List = response.data.docs;
           setData(List);
@@ -186,7 +225,7 @@ const PostList = () => {
 
   ////////////////홈버튼
   const HomeButton = () => {
-    dispatch(DeletNoWid());
+    //dispatch(DeletNoWid());
     dispatch(DeleteSearch());
     setMenu("제목");
     search_ref.current.state.value = "";
@@ -195,6 +234,7 @@ const PostList = () => {
   };
 
   function handleMenuClick(e) {
+    console.log(e.key);
     setMenu(e.key);
   }
   const menu = (
@@ -222,11 +262,34 @@ const PostList = () => {
   );
 
   const best = () => {
-    dispatch(update_best());
+    dispatch(update_best("추천수"));
     dispatch(pageupdate(1));
     window.scrollTo(0, 0);
   };
-  //////////////////////작성자 클릭///////////////////////
+  const best_count = () => {
+    dispatch(update_best("조회수"));
+    dispatch(pageupdate(1));
+    window.scrollTo(0, 0);
+  };
+  const best_fin = () => {
+    dispatch(update_best("인기종목"));
+    dispatch(pageupdate(1));
+    window.scrollTo(0, 0);
+  };
+
+  const category_menu = (
+    <Menu>
+      <Menu.Item key="추천수" onClick={best}>
+        추천수
+      </Menu.Item>
+      <Menu.Item key="조회수" onClick={best_count}>
+        조회수
+      </Menu.Item>
+      <Menu.Item key="인기종목" onClick={best_fin}>
+        인기종목
+      </Menu.Item>
+    </Menu>
+  );
 
   return (
     <div className="Main_LIST">
@@ -234,7 +297,7 @@ const PostList = () => {
         <colgroup>
           <col width="10%" />
           <col width="50%" />
-          <col width="8%" />
+          <col width="10%" />
           <col width="8%" />
           <col width="8%" />
           <col width="8%" />
@@ -262,7 +325,7 @@ const PostList = () => {
               )}
               <td>
                 <Link to={`/posts/${user._id}?page=${Reduxpage}`}>
-                  [{user.post_fin_list.name}] {user.post_title} [
+                  [{user.post_fin_list.name}]{user.post_title} [
                   {user.post_comment.length}]
                 </Link>
               </td>
@@ -273,7 +336,13 @@ const PostList = () => {
                   </span>
                 </Dropdown>
               </td>
-              <td>{dayjs(user.post_date).format("HH:mm")}</td>
+              {dayjs().format("YYYY-MM-DD") <=
+              dayjs(user.post_date).format("YYYY-MM-DD") ? (
+                <td>{dayjs(user.post_date).format("HH:mm")}</td>
+              ) : (
+                <td>{dayjs(user.post_date).format("MM.DD")}</td>
+              )}
+
               <td>{user.post_count}</td>
               <td>{user.post_recommend}</td>
               <td
@@ -294,10 +363,12 @@ const PostList = () => {
       </Table>
       <div className="page_box">
         <div>
-          <Button onClick={HomeButton} style={{ marginRight: "2px" }}>
+          <Button style={{ marginRight: "2px" }} onClick={HomeButton}>
             전체글
           </Button>
-          <Button onClick={best}>인기글</Button>
+          <Dropdown overlay={category_menu} trigger="click">
+            <Button>인기글</Button>
+          </Dropdown>
         </div>
 
         <Pagination
@@ -307,7 +378,7 @@ const PostList = () => {
           showSizeChanger={false}
         />
         <Link to="/posts" className="text-white text-decoration-none">
-          <Button type="primary">글 작성</Button>
+          <Button>글쓰기</Button>
         </Link>
       </div>
       <br></br>

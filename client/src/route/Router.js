@@ -1,7 +1,6 @@
 import React, { Fragment } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import AppNavbar from "../components/AppNavbar";
 import { Switch, Route } from "react-router-dom";
 import PostWrite from "./normalRoute/PostWrite";
 import PostDetail from "./normalRoute/PostDetail";
@@ -10,10 +9,10 @@ import PostEdit from "./normalRoute/PostEdit";
 import PrivateRoute from "./PrivateRouter/PrivateRouter";
 import MyPage from "./normalRoute/MyPage";
 import Main from "./normalRoute/MainPage";
+//import AppNavbar from "../components/AppNavbar";
 
 const MyRouter = () => (
   <Fragment>
-    <AppNavbar />
     <Header />
     <Switch>
       <Route path="/" exact component={LoginPage} />
