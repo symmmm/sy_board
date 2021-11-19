@@ -19,12 +19,14 @@ const Report = (props) => {
     axios
       .post(SERVER_URI + "/report/report", {
         report_form_data: { selected_value: getMenu, content: content },
-        board_id: props.board_id,
+        comment_id: props.comment_id,
         bad_user: props.bad_user,
       })
       .then((response) => {
-        console.log(response.data);
-        alert("신고가 완료되었습니다.");
+        //console.log(response);
+        alert(
+          "신고가 완료되었습니다. 신고된 내용은 확인후 신속하게 처리하겠습니다."
+        );
       });
     setIsModalVisible(false);
   };
@@ -52,17 +54,10 @@ const Report = (props) => {
   }
   return (
     <>
-      <span
-        onClick={showModal}
-        style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
-      >
-        <AlertOutlined style={{ color: "red" }} />
-        <span style={{ fontSize: "14px", marginLeft: "5px" }}>신고</span>
-      </span>
-
+      <AlertOutlined onClick={showModal} className="report_btn" />
       <Modal
         className="report_modal"
-        title="게시글 신고하기"
+        title="댓글 신고하기"
         centered
         visible={isModalVisible}
         onOk={handleOk}
@@ -71,7 +66,7 @@ const Report = (props) => {
         cancelButtonProps={{ style: { display: "none" } }}
         footer={null}
       >
-        <p className="report_content">제목 : {props.report_title}</p>
+        <p className="report_content">댓글내용 : {props.comment_content}</p>
         <p>작성자 : {props.bad_user_nick}</p>
         <p>
           <Dropdown overlay={menu} trigger="click">

@@ -13,17 +13,17 @@ const Chart = () => {
     (state) => state.PageSearchReducer.fincode
   );
   useEffect(() => {
-    console.log("차트실행");
+    //console.log("차트최신화");
     axios
       .post(SERVER_URI + "/board/chart", {
         fin_name: fincode_redux_data,
       })
       .then((response) => {
-        //console.log(response.data.chart_data);
+        ////console.log(response.data.chart_data);
         settdata(response.data.chart_data);
       });
     return () => {
-      //console.log("클린업");
+      //console.log("차트클린");
       settdata([]);
     };
   }, [fincode_redux_data]);
@@ -32,13 +32,13 @@ const Chart = () => {
 
   return (
     <div>
-      <span>{fincode_redux_data}의 최근 관심률</span>
+      {/* <span>{fincode_redux_data}의 최근 관심률</span> */}
       <LineChart
         width={255}
         height={120}
         data={tdata}
         margin={{
-          top: 5,
+          top: 15,
           right: 5,
           left: -30,
           bottom: 0,

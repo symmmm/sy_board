@@ -1,5 +1,4 @@
-import { UPDATE_NOWID,DELETE_NOWID } from "../type";
-
+import { UPDATE_NOWID, DELETE_NOWID } from "../type";
 
 export const nowpaging = (pagenowid) => ({
   type: UPDATE_NOWID,
@@ -7,7 +6,7 @@ export const nowpaging = (pagenowid) => ({
 });
 
 export const DeletNoWid = () => ({
-  type: DELETE_NOWID
+  type: DELETE_NOWID,
 });
 
 const initialState = {
@@ -21,11 +20,11 @@ const NowReducer = (state = initialState, action) => {
         ...state,
         pagenowid: action.payload.id,
       };
-      case DELETE_NOWID:
-        return {
-          ...state,
-          pagenowid:"",
-        };
+    case DELETE_NOWID:
+      return {
+        ...state,
+        pagenowid: "",
+      };
 
     default:
       return { ...state };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import banner from "../img/banner.jpg";
 const Topbanner = () => {
   const TOPBANNER = localStorage.getItem("TOPBANNER");
   const [showbanner, set_showbanner] = useState(false);
@@ -31,11 +31,8 @@ const Topbanner = () => {
         }}
       >
         <div className="topbanner_image">
-          <a
-            href="https://www.hitalktv.com/maingo.do"
-            target="_blank"
-            rel="noreferrer noopenner"
-          ></a>
+          <img alt="banner" src={banner}></img>
+
           <a href="#/" onClick={banner_close} className="close_button">
             {" "}
           </a>

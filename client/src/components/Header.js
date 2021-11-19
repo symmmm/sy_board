@@ -5,10 +5,13 @@ import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { logoutButton } from "../redux/reducers/ButtonReducer";
 import config from "../config/index";
-import logo from "../img/logo.png";
+import youtube_banner from "../img/youtube_banner.png";
+import hitalk_logo from "../img/logo.png";
+import kakaoplus_banner from "../img/kakaoplus-banner.jpg";
 import login_icon from "../img/icon-id.png";
 import Topbanner from "./Topbanner";
 import Event from "./Event";
+import Visual from "./VisualRecommend";
 const { SERVER_URI } = config;
 
 const Header = () => {
@@ -34,7 +37,7 @@ const Header = () => {
   useEffect(() => {
     if (logoutstate) {
       axios.get(SERVER_URI + "/user_check").then((response) => {
-        //console.log(response.data.userName);
+        //console.log(response.data);
         setNickname(response.data.userName);
       });
     }
@@ -66,7 +69,6 @@ const Header = () => {
         style={{
           backgroundColor: "white",
           height: "100px",
-          marginBottom: "40px",
           borderBottom: "1px solid #dadada",
           display: "flex",
           flexDirection: "row",
@@ -76,11 +78,11 @@ const Header = () => {
           <div style={{ display: "flex" }}>
             <div className="image_box" style={{ paddingTop: "9px" }}>
               <a
-                href="https://www.suwon.ac.kr"
+                href="https://www.hitalktv.com/maingo.do"
                 target="_blank"
                 rel="noreferrer noopenner"
               >
-                <img alt="logo" src={logo}></img>
+                <img alt="hitalk_logo" src={hitalk_logo}></img>
               </a>
             </div>
           </div>
@@ -120,25 +122,26 @@ const Header = () => {
                 width: "180px",
                 position: "relative",
                 left: "25px",
-                backgroundColor: "grey",
-                border: "1px solid #444444",
               }}
             >
-              배너
+              <img
+                alt="kakaoplus_banner"
+                src={kakaoplus_banner}
+                style={{
+                  width: "180px",
+                  height: "85px",
+                }}
+              ></img>
             </div>
-            <div
-              className="image_box"
-              style={{
-                paddingTop: "14px",
-                zIndex: "10",
-                width: "180px",
-                position: "relative",
-                left: "25px",
-                backgroundColor: "grey",
-                border: "1px solid #444444",
-              }}
-            >
-              배너
+            <div className="image_box">
+              <img
+                alt="youtube_banner"
+                src={youtube_banner}
+                style={{
+                  width: "224px",
+                  height: "85px",
+                }}
+              ></img>
             </div>
           </div>
         </div>
@@ -153,6 +156,7 @@ const Header = () => {
           <p>정말 로그아웃 하시겠습니까?</p>
         </Modal>
       </div>
+      <Visual />
     </div>
   );
 };

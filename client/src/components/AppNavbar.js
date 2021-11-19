@@ -30,18 +30,17 @@ const AppNavbar = () => {
 
   const mypage = () => {
     axios.get(SERVER_URI + "/user_check").then((response) => {
-      ////console.log(response.data.userName)
+      //////console.log(response.data.userName)
       const UserName = response.data.userName;
       history.push({
         pathname: "/mypage",
         state: { username: UserName },
       });
-      //console.log("usercheck", UserName);
+      ////console.log("usercheck", UserName);
     });
   };
 
   //////////////////로그아웃/////////////
-
   const logout = () => {
     sessionStorage.clear();
     history.push("/");

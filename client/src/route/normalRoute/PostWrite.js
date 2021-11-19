@@ -1,27 +1,24 @@
-import React from "react";
-import { Button, Divider, Input } from "antd";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { Button, Input } from "antd";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import Checkbox from "@material-ui/core/Checkbox";
 import { useDispatch } from "react-redux";
 import { DeleteSearch } from "../../redux/reducers/PageReducer";
 import { DeletNoWid } from "../../redux/reducers/NowpageReducer";
 import ReactQuill, { Quill } from "react-quill";
+import config from "../../config/index";
 import "react-quill/dist/quill.snow.css";
 import Loading from "../../components/Loading";
 import ImageResize from "quill-image-resize";
 import VideoResize from "quill-video-resize-module2";
-import config from "../../config/index";
+Quill.register("modules/ImageResize", ImageResize);
+Quill.register("modules/VideoResize", VideoResize);
 const { IMAGE_URI } = config;
 const { SERVER_URI } = config;
 const { FINCODE_URI } = config;
-// console.log(FINCODE_URI);
-// console.log(SERVER_URI);
-// console.log(IMAGE_URI);
-Quill.register("modules/ImageResize", ImageResize);
-Quill.register("modules/VideoResize", VideoResize);
 
 function PostWrite() {
   const quillRef = useRef();
@@ -65,21 +62,18 @@ function PostWrite() {
   ////////////////////////////////////////////////////////////////////
   const [Codedata, setCodeData] = useState([]);
   const dispatch = useDispatch();
-  ////////////////////////////////////////////////종목코드 받아오기////////////////////////////////////
+  ////////////////////////////////////////////////종목코드 받아오기///////////////
   useEffect(() => {
     axios.get(FINCODE_URI).then((response) => {
-      ////console.log(response.data.datalist);
       const CodeList = response.data.datalist;
       setCodeData(CodeList);
     });
   }, []);
-
   /////////////////////////////////////////////글작성/////////////////
   const history = useHistory();
   const [CodeInput, setCodeInput] = useState();
   const [ContentData, setContentData] = useState("");
   const [Title, setTitle] = useState();
-
   const submitReview = () => {
     if (Title.length >= 16) {
       alert("제목의 길이는 15글자 이하로 설정해주세요");
@@ -98,6 +92,15 @@ function PostWrite() {
         )
         .then((response) => {
           if (response.data.board_insert === 1) {
+            if (checked) {
+              axios
+                .post(SERVER_URI + "/fin_interest/insert", {
+                  fin_interest_data: CodeInput,
+                })
+                .then((res) => {
+                  console.log(res);
+                });
+            }
             alert("글 작성 완료");
             dispatch(DeletNoWid());
             dispatch(DeleteSearch());
@@ -116,8 +119,40 @@ function PostWrite() {
     console.log(e.target.value.length);
   };
 
+  const [total_UPpercent, set_total_UPpercent] = useState("");
+  const [total_Downpercent, set_total_Downpercent] = useState("");
   const onCodeHandler = (event, newValue) => {
+    console.log(newValue?.name);
+    const codename = newValue?.name;
     setCodeInput(newValue);
+    axios
+      .post(SERVER_URI + "/finance/info", {
+        finance_name: codename,
+      })
+      .then((response) => {
+        if (response.data === "") {
+          set_total_UPpercent(50);
+          set_total_Downpercent(50);
+        } else {
+          set_total_UPpercent(
+            Math.round(
+              (response.data.finance_Up_Count /
+                (response.data.finance_Up_Count +
+                  response.data.finance_Down_Count)) *
+                100
+            )
+          );
+          set_total_Downpercent(
+            100 -
+              Math.round(
+                (response.data.finance_Up_Count /
+                  (response.data.finance_Up_Count +
+                    response.data.finance_Down_Count)) *
+                  100
+              )
+          );
+        }
+      });
   };
   const Back = () => {
     history.goBack();
@@ -155,7 +190,7 @@ function PostWrite() {
         },
       },
       ImageResize: {
-        modules: ["Resize", "DisplaySize", "Toolbar"],
+        modules: ["Resize", "DisplaySize"],
         handleStyles: {
           backgroundColor: "black",
           border: "none",
@@ -163,7 +198,7 @@ function PostWrite() {
         },
       },
       VideoResize: {
-        modules: ["Resize", "DisplaySize", "Toolbar"],
+        modules: ["Resize", "DisplaySize"],
         tagName: "iframe", // iframe | video
       },
     };
@@ -183,23 +218,66 @@ function PostWrite() {
     "link",
   ];
   ////////////////
+  const [checked, setChecked] = useState(false);
+  const handleChange = (event) => {
+    console.log(event.target.checked);
+    setChecked(event.target.checked);
+  };
   return (
     <div>
       <div className="App">
         <h2>글 작성</h2>
-        <Autocomplete
-          onChange={onCodeHandler}
-          options={Codedata}
-          getOptionLabel={(option) => option.name + "ㅣ" + option.code}
-          style={{ width: 300 }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="종목코드를 선택하세요"
-              margin="normal"
-            />
-          )}
-        />
+        <div className="favorite_check_div">
+          <Autocomplete
+            onChange={onCodeHandler}
+            options={Codedata}
+            getOptionLabel={(option) => option.name + "ㅣ" + option.code}
+            style={{ width: 250 }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="종목코드를 선택하세요"
+                margin="normal"
+              />
+            )}
+          />
+        </div>
+        {CodeInput === undefined ? (
+          ""
+        ) : (
+          <div style={{ display: "flex", height: "30px" }}>
+            <div
+              className="vote"
+              style={{
+                marginTop: "-9px",
+                width: "250px",
+                height: "34px",
+              }}
+            >
+              <div
+                className="vote-inline-graph up"
+                style={{ width: `${total_UPpercent}%` }}
+              >
+                {total_UPpercent}%
+              </div>
+              <div
+                className="vote-inline-graph down"
+                style={{ width: `${total_Downpercent}%` }}
+              >
+                {total_Downpercent}%
+              </div>
+            </div>
+            <span className="favorite_check">
+              관심종목등록
+              <Checkbox
+                color="primary"
+                onChange={handleChange}
+                style={{ color: "rgba(236, 106, 23)" }}
+              />
+            </span>
+          </div>
+        )}
+
         <Input
           className="title"
           type="text"
@@ -223,8 +301,6 @@ function PostWrite() {
           />
         </div>
         <br></br>
-        <br></br>
-        <br></br>
         <input
           ref={fileRef}
           type="file"
@@ -237,23 +313,18 @@ function PostWrite() {
       <div className="edit_button_wrap">
         <Button
           style={{
-            marginLeft: "1px",
-            borderRadius: "2em",
             color: "rgba(236, 106, 23)",
           }}
           onClick={submitReview}
         >
-          등록
+          작성
         </Button>
-        <Button
-          onClick={Back}
-          style={{ marginLeft: "1px", borderRadius: "2em" }}
-        >
+        <Button onClick={Back} style={{ marginLeft: "1px" }}>
           취소
         </Button>
       </div>
       {loading && <Loading />}
-      <Divider />
+      <br></br>
     </div>
   );
 }

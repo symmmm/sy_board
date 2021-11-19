@@ -6,7 +6,11 @@ import FavoriteIcon from "@material-ui/icons/Favorite";
 import axios from "axios";
 import { useHistory, useParams, Link } from "react-router-dom";
 import Main from "./MainPage";
-import { AlertOutlined } from "@ant-design/icons";
+import {
+  CommentOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
 import { DeletNoWid } from "../../redux/reducers/NowpageReducer";
@@ -15,6 +19,7 @@ import { DeleteSearch, fincode_update } from "../../redux/reducers/PageReducer";
 import { nowCount, postCount } from "../../redux/reducers/CountReducer";
 import Like from "./Like";
 import Report from "../../components/Report";
+import CommentReport from "../../components/CommentReport";
 import config from "../../config/index";
 
 const { SERVER_URI } = config;
@@ -76,8 +81,7 @@ const PostDetail = () => {
       .delete(SERVER_URI + "/board/" + nowid.id, {
         headers: { authorization: sessionStorage.getItem("user_Token") },
       })
-      .then((response) => {
-        ////console.log(response);
+      .then(() => {
         history.push("/main");
       });
   };
@@ -92,15 +96,11 @@ const PostDetail = () => {
       setCdata(response.data.list.post_comment);
       setData(response.data.list);
       window.scrollTo(0, 0);
-      console.log(response.data.list.post_comment.length);
-      //dispatch(nowpaging(nowid.id));
       dispatch(postCount(response.data.list.post_count));
       dispatch(fincode_update(response.data.list.post_fin_list.name));
     });
     return () => {
-      //console.log("리스트 언마운트");
       dispatch(fincode_update());
-      //dispatch(nowpaging());
     };
   }, [nowid]);
   /////리덕스이용해서 추천수올리기
@@ -109,18 +109,15 @@ const PostDetail = () => {
       .get(SERVER_URI + "/board/view/update/" + nowid.id)
       .then((response) => {
         setData(response.data.list);
-        //console.log(response.data.list.post_count);
-        //////console.log("좋아요 갯수",response.data.list.post_recommend)
-        ////console.log("좋아요 갯수 업데이트");
       });
-  }, [LikeCount]);
+  }, [LikeCount, nowid]);
 
   //////////////자기글만 삭제 수정하기//////////////
-  const [UserName, setUserName] = useState("");
+  const [UserID, setUserID] = useState("");
   useEffect(() => {
     axios.get(SERVER_URI + "/user_check").then((response) => {
-      //////console.log(response.data.userName)
-      setUserName(response.data.userName);
+      console.log(response.data.userID);
+      setUserID(response.data.userID);
     });
   }, [nowid]);
   //////////////////////////댓글 작성/////////////////////////////
@@ -265,11 +262,11 @@ const PostDetail = () => {
       });
   };
   ////////////////////////////////////////
-
+  console.log(Cdata);
   return (
     <div style={{ width: "1300px", margin: "0 auto" }}>
       <div style={{ textAlign: "center" }}>
-        <Title onClick={HomeButton}>토론게시판</Title>
+        {/* <Title onClick={HomeButton}>토론게시판</Title> */}
         <Divider className="titledivider" />
       </div>
       <div className="TitleName">
@@ -279,53 +276,51 @@ const PostDetail = () => {
       </div>
       <div className="DetailHeader">
         <div className="TitleAuthor">
-          {data.post_author} ㅣ{" "}
-          {dayjs(data.post_date).format("YYYY.MM.DD HH:mm:ss")}
+          {data.post_author} ㅣ {dayjs(data.post_date).format("YY.MM.DD HH:mm")}{" "}
+          ㅣ 조회수:
+          {data.post_count}
         </div>
-        <div>
-          조회수:{data.post_count} ㅣ 추천수:{data.post_recommend} ㅣ댓글수:
-          {Cdata.length}
-        </div>
+        <span></span>
       </div>
       <Divider className="titledivider" />
       <div
         className="detail"
         dangerouslySetInnerHTML={{ __html: data.post_content }}
       ></div>
-      <div className="detail_button_wrap">
-        <Like username={UserName} />
-        {UserName === data.post_author ? (
+
+      {/* <Divider className="divider" /> */}
+      <div className="detail_wrap">
+        <div className="like_button">
+          <Like />
+          <CommentOutlined style={{ fontSize: "21px", marginLeft: "7px" }} />
+          <span className="Like_count">
+            댓글<span>{Cdata.length}</span>
+          </span>
+        </div>
+        {UserID === data.post_author_ID ? (
           <div>
             <Link to={`/edit/${data._id}`}>
-              <Button
-                style={{
-                  marginLeft: "1px",
-                  borderRadius: "2em",
-                  color: "rgba(236, 106, 23)",
-                }}
-              >
-                수정
-              </Button>
+              <EditOutlined style={{ fontSize: "21px" }} />
+              <span>수정</span>
             </Link>
-            <Button
+            <span
               onClick={showModal}
-              style={{ marginLeft: "1px", borderRadius: "2em" }}
+              style={{ marginLeft: "8px", cursor: "pointer" }}
             >
-              삭제
-            </Button>
+              <DeleteOutlined style={{ fontSize: "20px" }} />
+              <span>삭제</span>
+            </span>
           </div>
         ) : (
           <Report
             report_title={data.post_title} //제목
-            bad_user={data.post_author} //신고유저
-            report_user={UserName} //신고자
+            bad_user={data.post_author_ID} //신고유저
             board_id={nowid.id} //게시글아이디
+            bad_user_nick={data.post_author}
           />
         )}
       </div>
-      <Divider className="divider" />
-      <span className="commnet_count">{Cdata.length}</span>
-      <span style={{ fontWeight: "600" }}>개의 댓글</span>
+
       {Cdata.map((aaa, index) => (
         <div className="comment_box" key={index}>
           <span style={{ fontWeight: "bold" }}>{aaa.comment_author}</span>
@@ -343,7 +338,7 @@ const PostDetail = () => {
             <span onClick={() => reButton(aaa._id)}>{aaa.comment_content}</span>
             <div className="like_button" style={{ fontSize: "15px" }}>
               {aaa.comment_recommend_user.findIndex(
-                (a) => a.comment_recommend_user === UserName
+                (a) => a.comment_recommend_user === UserID
               ) === 0 ? (
                 <FavoriteIcon
                   className="onlikeicon"
@@ -362,7 +357,7 @@ const PostDetail = () => {
                 />
               )}{" "}
               {aaa.comment_recommend}
-              {aaa.comment_author === UserName ? (
+              {aaa.comment_author_ID === UserID ? (
                 <span
                   className="comment_delete"
                   onClick={() => {
@@ -372,7 +367,12 @@ const PostDetail = () => {
                   삭제
                 </span>
               ) : (
-                <AlertOutlined className="report_btn" />
+                <CommentReport
+                  comment_content={aaa.comment_content} //내용
+                  bad_user_nick={aaa.comment_author}
+                  bad_user={aaa.comment_author_ID} //신고당하는사람
+                  comment_id={aaa._id} //게시글아이디
+                />
               )}
             </div>
           </div>
@@ -397,7 +397,7 @@ const PostDetail = () => {
                 <div className="like_button" style={{ fontSize: "15px" }}>
                   {" "}
                   {bbb.recomment_recommend_user.findIndex(
-                    (b) => b.recomment_recommend_user === UserName
+                    (b) => b.recomment_recommend_user === UserID
                   ) === 0 ? (
                     <FavoriteIcon
                       className="onlikeicon"
@@ -416,7 +416,7 @@ const PostDetail = () => {
                     />
                   )}{" "}
                   {bbb.recomment_recommend}
-                  {bbb.recomment_author === UserName ? (
+                  {bbb.recomment_author_ID === UserID ? (
                     <span
                       className="comment_delete"
                       onClick={() => {
@@ -426,7 +426,12 @@ const PostDetail = () => {
                       삭제
                     </span>
                   ) : (
-                    <AlertOutlined className="report_btn" />
+                    <CommentReport
+                      comment_content={bbb.recomment_content} //내용
+                      bad_user_nick={bbb.recomment_author}
+                      bad_user={bbb.recomment_author_ID} //신고당하는사람
+                      comment_id={bbb._id} //게시글아이디
+                    />
                   )}
                 </div>
               </div>
@@ -452,120 +457,7 @@ const PostDetail = () => {
           )}
         </div>
       ))}
-      {/* <Table>
-        <colgroup>
-          <col width="10%" />
-          <col width="70%" />
-          <col width="7%" />
-          <col width="9%" />
-        </colgroup>
-        <tbody className="Commentsbody">
-          {Cdata.map((aaa, index) => (
-            <tr key={index}>
-              <td>{aaa.comment_author}</td>
-              <td>
-                <div onClick={() => reButton(aaa._id)}>
-                  {aaa.comment_content}
-                </div>
-                {openRecomment ? (
-                  commentID === aaa._id ? (
-                    <div>
-                      <Input
-                        type="textarea"
-                        value={WriteReComment}
-                        placeholder="답글을 입력해주세요"
-                        onChange={ReCommentHandler}
-                      />
-                      <Button onClick={() => RCwrite(aaa._id)}>답글쓰기</Button>
-                    </div>
-                  ) : (
-                    ""
-                  )
-                ) : (
-                  ""
-                )}
-                <Table className="recommentTable">
-                  <colgroup>
-                    <col width="10%" />
-                    <col width="60%" />
-                    <col width="11%" />
-                    <col width="13%" />
-                  </colgroup>
-                  <tbody className="recommenttable">
-                    {aaa.comment_recomment.map((bbb, index) => (
-                      <tr key={index}>
-                        <td>└ {bbb.recomment_author}</td>
-                        <td>{bbb.recomment_content}</td>
-                        <td className="likebox">
-                          {" "}
-                          <Button
-                            className="commentlike"
-                            onClick={() => {
-                              CClikeClick(aaa._id, bbb._id);
-                            }}
-                          >
-                            {bbb.recomment_recommend_user.findIndex(
-                              (b) => b.recomment_recommend_user === UserName
-                            ) === 0 ? (
-                              <LikeFilled className="onlike" />
-                            ) : (
-                              <LikeFilled />
-                            )}{" "}
-                            : {bbb.recomment_recommend}
-                          </Button>
-                        </td>
-                        <td>{bbb.recomment_date}</td>
-                        <td>
-                          {bbb.recomment_author === UserName ? (
-                            <CloseOutlined
-                              onClick={() => {
-                                show_CC_Modal(aaa._id, bbb._id);
-                              }}
-                            />
-                          ) : (
-                            ""
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </td>
-              <td>
-                {" "}
-                <Button
-                  className="commentlike"
-                  onClick={() => {
-                    ClikeClick(aaa._id);
-                  }}
-                >
-                  {aaa.comment_recommend_user.findIndex(
-                    (a) => a.comment_recommend_user === UserName
-                  ) === 0 ? (
-                    <LikeFilled className="onlike" />
-                  ) : (
-                    <LikeFilled />
-                  )}{" "}
-                  : {aaa.comment_recommend}
-                </Button>
-              </td>
-              <td>{dayjs(aaa.comment_date).format("MM.DD HH:mm:ss")}</td>
 
-              <td>
-                {aaa.comment_author === UserName ? (
-                  <CloseOutlined
-                    onClick={() => {
-                      show_C_Modal(aaa._id);
-                    }}
-                  />
-                ) : (
-                  ""
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table> */}
       <Input
         className="commentbox"
         type="textarea"
@@ -574,11 +466,10 @@ const PostDetail = () => {
         onChange={CommentHandler}
       />
       <div className="detail_button_wrap">
-        {" "}
-        <Button style={{ borderRadius: "2em" }} onClick={cWrite}>
-          댓글쓰기
-        </Button>
+        <Button onClick={cWrite}>댓글쓰기</Button>
       </div>
+      <br></br>
+      <br></br>
       <Main />
       <Modal
         title="게시글"

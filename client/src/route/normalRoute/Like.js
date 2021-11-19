@@ -19,7 +19,6 @@ const Like = () => {
     axios
       .get(SERVER_URI + "/board/view/recommend/" + nowid.id)
       .then((response) => {
-        //////console.log(response.data.recommend_count);
         SET_LIKE_COUNT(response.data.recommend_count);
         dispatch(nowLIKECount(response.data.recommend_count));
         if (like === -1) {
@@ -30,11 +29,10 @@ const Like = () => {
       });
   };
 
-  const [Nickname, setNickname] = useState("");
+  const [ID, setID] = useState("");
   useEffect(() => {
     axios.get(SERVER_URI + "/user_check").then((response) => {
-      setNickname(response.data.userName);
-      //////console.log(response.data.userName);
+      setID(response.data.userID);
     });
   }, [nowid]);
 
@@ -45,38 +43,38 @@ const Like = () => {
     axios
       .get(SERVER_URI + "/board/view/update/" + nowid.id)
       .then((response) => {
-        //////console.log(response.data.list.post_recommend_user)
+        //console.log(response.data.list.post_recommend_user);
         SET_LIKE_COUNT(response.data.list.post_recommend);
         const index = response.data.list.post_recommend_user.findIndex(
-          (aaa) => aaa.recommend_user === Nickname
+          (aaa) => aaa.recommend_user === ID
         );
 
         setlike(index);
-        //////console.log("추천확인 -1이면 안누름", index);
       });
-  }, [nowid, LikeCount, Nickname]);
+  }, [nowid, LikeCount, ID]);
 
   return (
     <>
       <div className="like">
         {like === -1 ? (
           <div className="like_button">
-            {" "}
             <FavoriteBorderIcon
               className="likeicon"
               onClick={likeclick}
-              style={{ fontSize: "30px" }}
+              style={{ fontSize: "23px" }}
             />
-            <span className="Like_count">{LIKE_COUNT}</span>
+            <span className="Like_count">
+              좋아요<span>{LIKE_COUNT}</span>
+            </span>
           </div>
         ) : (
           <div className="like_button">
             <FavoriteIcon
               className="onlikeicon"
               onClick={likeclick}
-              style={{ fontSize: "30px" }}
+              style={{ fontSize: "23px" }}
             />
-            <span className="Like_count">{LIKE_COUNT}</span>
+            <span className="Like_count">좋아요 {LIKE_COUNT}</span>
           </div>
         )}
       </div>

@@ -1,4 +1,4 @@
-import { Button, Divider, Input } from "antd";
+import { Button, Input } from "antd";
 import axios from "axios";
 import { useHistory, useParams } from "react-router-dom";
 import { useState, useEffect, useRef, useMemo } from "react";
@@ -137,7 +137,7 @@ function PostEdit() {
       setOriginCode(response.data.list.post_fin_list);
       setOrigincontent(response.data.list.post_content);
     });
-  }, []);
+  }, [board_id]);
   ////////////////////////////// 글수정////////////////////////////////////////////////////////////////////////////////
 
   const submitReview = () => {
@@ -206,8 +206,6 @@ function PostEdit() {
           />
         </div>
         <br></br>
-        <br></br>
-        <br></br>
         <input
           ref={fileRef}
           type="file"
@@ -220,8 +218,6 @@ function PostEdit() {
       <div className="edit_button_wrap">
         <Button
           style={{
-            marginLeft: "1px",
-            borderRadius: "2em",
             color: "rgba(236, 106, 23)",
           }}
           onClick={submitReview}
@@ -229,15 +225,12 @@ function PostEdit() {
           수정
         </Button>
 
-        <Button
-          onClick={Back}
-          style={{ marginLeft: "1px", borderRadius: "2em" }}
-        >
+        <Button onClick={Back} style={{ marginLeft: "1px" }}>
           취소
         </Button>
       </div>
       {loading && <Loading />}
-      <Divider />
+      <br></br>
     </div>
   );
 }

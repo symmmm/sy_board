@@ -36,21 +36,25 @@ const Favorite = React.memo(() => {
 
   ////////관심종목 추가, 삭제/////////
   const favorite_Button = () => {
-    axios
-      .post(SERVER_URI + "/fin_interest/insert", {
-        fin_interest_data: CodeInput,
-      })
-      .then((res) => {
-        const result = res.data.fin_interest_insert_result;
-        if (result === 0) {
-          alert("이미 관심종목 리스트에 추가되어있습니다.");
-        } else {
-          axios.get(SERVER_URI + "/fin_interest/view").then((response) => {
-            ////console.log(response.data.fin_interest_data);
-            setMycode(response.data.fin_interest_data);
-          });
-        }
-      });
+    if (CodeInput) {
+      axios
+        .post(SERVER_URI + "/fin_interest/insert", {
+          fin_interest_data: CodeInput,
+        })
+        .then((res) => {
+          const result = res.data.fin_interest_insert_result;
+          if (result === 0) {
+            alert("이미 관심종목 리스트에 추가되어있습니다.");
+          } else {
+            axios.get(SERVER_URI + "/fin_interest/view").then((response) => {
+              ////console.log(response.data.fin_interest_data);
+              setMycode(response.data?.fin_interest_data);
+            });
+          }
+        });
+    } else {
+      alert("관심종목을 선택해주세요");
+    }
   };
 
   const Delete_Button = (code) => {
@@ -84,8 +88,6 @@ const Favorite = React.memo(() => {
   const [check, setcheck] = useState("");
   const [minus_check, minus_setcheck] = useState("");
   useEffect(() => {
-    ////console.log("data", fincode_redux_data);
-    ////console.log("이펙트실행");
     axios
       .post(SERVER_URI + "/finance/info", {
         finance_name: fincode_redux_data,
@@ -93,18 +95,16 @@ const Favorite = React.memo(() => {
       .then((response) => {
         const header = window.sessionStorage.getItem("user_Token");
         const array = header.split(".");
-        const userName = JSON.parse(Base64.decode(array[1])).userName;
-        ////console.log(userName);
+        const userID = JSON.parse(Base64.decode(array[1])).userID;
+        //console.log(userID);
 
         if (fincode_redux_data) {
           const index = response.data.finance_Up_Count_User;
-          const index_check = index.findIndex((g) => g === userName);
+          const index_check = index.findIndex((g) => g === userID);
           setcheck(index_check);
           ////console.log("투표확인 안했으면 -1 ", index_check);
           const minus_index = response.data.finance_Down_Count_User;
-          const minus_index_check = minus_index.findIndex(
-            (h) => h === userName
-          );
+          const minus_index_check = minus_index.findIndex((h) => h === userID);
           minus_setcheck(minus_index_check);
           ////console.log("하락 투표확인 안했으면 -1 ", minus_index_check);
         }

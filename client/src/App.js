@@ -14,11 +14,11 @@ axios.interceptors.request.use(
     return config;
   },
   function (error) {
-    console.log("에러", error);
+    //console.log("에러", error);
     return Promise.reject(error);
   }
 );
-
+/////////////이프처리
 const App = () => {
   return (
     <Provider store={store}>

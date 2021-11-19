@@ -36,19 +36,18 @@ function LoginPage() {
         })
         .then((response) => {
           if (response.data.code === 200) {
+            //console.log(response.data.result.data.userId);
             axios
               .post(SERVER_URI + "/login", {
                 userName: response.data.result.data.me.username,
+                userID: response.data.result.data.userId,
               })
               .then((response) => {
-                //console.log("login_Post", response.data);
+                console.log(response.data);
                 sessionStorage.setItem("user_Token", response.data);
-                // const isLogin = () => !!sessionStorage.getItem('user_Token');
                 dispatch(loginButton());
                 history.push("/main");
               });
-
-            //console.log("login");
           } else {
             alert("아이디 또는 비밀번호를 확인해주세요");
           }
@@ -62,13 +61,9 @@ function LoginPage() {
     dispatch(logoutButton());
   };
 
-  const home = () => {
-    history.push("/main");
-  };
-
   const onKeyPress = (e) => {
     if (e.key === "Enter") {
-      //console.log(e.key);
+      ////console.log(e.key);
       onLOGIN_Handler();
     }
   };
@@ -83,15 +78,14 @@ function LoginPage() {
       }}
     >
       {sessionStorage.getItem("user_Token") ? (
-        <div style={{ textAlign: "center" }}>
+        <div>
           이미 로그인되어 있습니다.
           <br></br>
           <Button onClick={logout}>로그아웃하기</Button>
-          <Button onClick={home}>홈으로 돌아가기</Button>
         </div>
       ) : (
         <div className="loginBox">
-          {/* <h2 style={{ textAlign: "center" }}>졸작졸작</h2> */}
+          <h2 style={{ textAlign: "center" }}>졸업작품</h2>
           <h2 style={{ textAlign: "center" }}>LOGIN</h2>
           <input
             className="loginWrap"

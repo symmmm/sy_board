@@ -14,6 +14,8 @@ import {
 //import { DeletNoWid } from "../../redux/reducers/NowpageReducer";
 import dayjs from "dayjs";
 import config from "../../config/index";
+import Searchhistory from "../../components/Searchhistory";
+//import useOutsideClick from "../../components/useOutsideClick";
 const { SERVER_URI } = config;
 const { Search } = Input;
 //import { nowpaging } from "../../redux/reducers/NowpageReducer";
@@ -21,6 +23,7 @@ const { Search } = Input;
 const PostList = () => {
   const nowid = useParams();
   const search_ref = useRef();
+  const ref = useRef();
   const history = useHistory();
   const dispatch = useDispatch();
   const [data, setData] = useState([]);
@@ -163,7 +166,15 @@ const PostList = () => {
       });
     }
     return () => {};
-  }, [searchValue, LikeCount, commentCount, Best_List, Reduxpage, postCount]);
+  }, [
+    searchValue,
+    LikeCount,
+    commentCount,
+    Best_List,
+    Reduxpage,
+    postCount,
+    SearchList,
+  ]);
 
   //////////////////////페이지 변경 ///////////////////
   const PageHandeler = (page) => {
@@ -180,17 +191,13 @@ const PostList = () => {
             page
         )
         .then((response) => {
-          ////console.log(page);
           setpageTotal(response.data.totalDocs);
           setData(response.data.docs);
-          //setPage(page);
         });
     } else {
       axios.get(SERVER_URI + "/board/list/" + page).then((response) => {
-        //////console.log(response.data);
         setpageTotal(response.data.totalDocs);
         setData(response.data.docs);
-        //setPage(page);
       });
     }
   };
@@ -208,14 +215,26 @@ const PostList = () => {
   ////////////////////////////////검색//////////////////////////
 
   const onSearch = (value) => {
-    if (value) {
+    set_Show_history(false);
+    if (value.length > 15) {
+      alert("검색어는 15자 이하입니다");
+    } else if (value === "") {
+      alert("검색어를 입력해주세요");
+    } else if (value.length <= 15) {
       axios
         .get(SERVER_URI + "/board/search/" + getMenu + "/" + value + "/0/0/1")
         .then((response) => {
-          const List = response.data.docs;
-          setData(List);
+          setData(response.data.docs);
           setpageTotal(response.data.totalDocs);
           dispatch(PageSearch(getMenu, value));
+          axios
+            .post(SERVER_URI + "/search_log/save", {
+              Search_Type: getMenu,
+              Search_Value: value,
+            })
+            .then((res) => {
+              console.log(res.data);
+            });
         });
     } else {
       alert("검색할 내용을 입력하세요.");
@@ -276,6 +295,34 @@ const PostList = () => {
     dispatch(pageupdate(1));
     window.scrollTo(0, 0);
   };
+  const [Show_history, set_Show_history] = useState(false);
+  // const onFocus = () => {
+  //   console.log("히스토리");
+  //   set_Show_history(true);
+  // };
+
+  // useOutsideClick(ref, () => {
+  //   //console.log(ref);
+  //   console.log("ref함수");
+  //   if (Show_history) set_Show_history(false);
+  // });
+  const search_click = (e) => {
+    //console.log("타켓", ref.current.contains(e.target));
+    //console.log("인풋포커스", search_ref.current.state.focused);
+    if (search_ref.current.state.focused === false) {
+      if (ref.current.contains(e.target)) {
+        return;
+      }
+      set_Show_history(false);
+    }
+  };
+  useEffect(() => {
+    //console.log("머하는놈이냐");
+    document.addEventListener("click", search_click);
+    return () => {
+      document.removeEventListener("click", search_click);
+    };
+  }, []);
 
   const category_menu = (
     <Menu>
@@ -290,7 +337,6 @@ const PostList = () => {
       </Menu.Item>
     </Menu>
   );
-
   return (
     <div className="Main_LIST">
       <Table>
@@ -372,6 +418,7 @@ const PostList = () => {
         </div>
 
         <Pagination
+          className="paging"
           current={Reduxpage}
           onChange={PageHandeler}
           total={pageTotal}
@@ -393,8 +440,13 @@ const PostList = () => {
           placeholder="내용을 입력하세요"
           onSearch={onSearch}
           enterButton
-        />
+          onClick={() => set_Show_history(!Show_history)}
+        ></Search>
       </div>
+      <div className="hhh" ref={ref}>
+        {Show_history ? <Searchhistory /> : ""}
+      </div>
+
       <br></br>
       <br></br>
     </div>
