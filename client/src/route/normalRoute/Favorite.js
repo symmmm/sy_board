@@ -9,7 +9,7 @@ import {
 } from "../../redux/reducers/PageReducer";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import TextField from "@material-ui/core/TextField";
-import { Button, Divider } from "antd";
+import { Button } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { Base64 } from "js-base64";
 import Chart from "../../components/chart";
@@ -78,14 +78,12 @@ const Favorite = React.memo(() => {
   );
 
   const finList_Button = (finname) => {
-    //////console.log(finname);
-    //setcheck_code(finname);
     dispatch(PageSearch("종목명", finname));
     dispatch(fincode_update(finname));
     dispatch(pageupdate(1));
   };
   //////////////투표 정보//////////////
-  const [check, setcheck] = useState("");
+  const [check, setcheck] = useState(false);
   const [minus_check, minus_setcheck] = useState("");
   useEffect(() => {
     axios
@@ -101,11 +99,19 @@ const Favorite = React.memo(() => {
         if (fincode_redux_data) {
           const index = response.data.finance_Up_Count_User;
           const index_check = index.findIndex((g) => g === userID);
-          setcheck(index_check);
-          ////console.log("투표확인 안했으면 -1 ", index_check);
+          if (index_check === -1) {
+            setcheck(false);
+          } else {
+            setcheck(true);
+          }
+          // console.log("투표확인 안했으면 -1 ", check);
           const minus_index = response.data.finance_Down_Count_User;
           const minus_index_check = minus_index.findIndex((h) => h === userID);
-          minus_setcheck(minus_index_check);
+          if (minus_index_check === -1) {
+            minus_setcheck(false);
+          } else {
+            minus_setcheck(true);
+          }
           ////console.log("하락 투표확인 안했으면 -1 ", minus_index_check);
         }
 
@@ -142,13 +148,14 @@ const Favorite = React.memo(() => {
       .post(SERVER_URI + "/finance/up", {
         finance_name: fincode_redux_data,
       })
-      .then(() => {
-        setcheck(0);
+      .then((res) => {
+        setcheck(!check);
         axios
           .post(SERVER_URI + "/finance/info", {
             finance_name: fincode_redux_data,
           })
           .then((response) => {
+            // console.log(response.data);
             set_total_UPpercent(
               Math.round(
                 (response.data.finance_Up_Count /
@@ -169,14 +176,13 @@ const Favorite = React.memo(() => {
           });
       });
   };
-
   const Down_Button = () => {
     axios
       .post(SERVER_URI + "/finance/down", {
         finance_name: fincode_redux_data,
       })
       .then(() => {
-        minus_setcheck(0);
+        minus_setcheck(!minus_check);
         axios
           .post(SERVER_URI + "/finance/info", {
             finance_name: fincode_redux_data,
@@ -216,94 +222,101 @@ const Favorite = React.memo(() => {
 
   return (
     <div className="favorite">
-      <div className="favorite_input">
-        <Autocomplete
-          onChange={onCodeHandler}
-          options={Codedata}
-          getOptionLabel={(option) => option.name + "ㅣ" + option.code}
-          style={{ width: 250 }}
-          renderInput={(params) => (
-            <TextField
-              label="관심종목을 선택하세요"
-              {...params}
-              margin="normal"
-            />
-          )}
-        />
-        <div>
-          <Button
-            onClick={() => {
-              favorite_Button();
-            }}
-          >
-            추가
-          </Button>
-        </div>
-        <Divider
-          className="titledivider"
-          style={{ marginBottom: "5px", marginTop: "5px" }}
-        ></Divider>
-        <div>내 관심종목</div>
-        <div className="favorite_list">
-          {MyCode.map((aaa, index) => {
-            return (
-              <div key={index}>
-                <div className="my_list">
-                  <span
-                    onClick={() => {
-                      finList_Button(aaa.name);
-                    }}
-                  >
-                    {aaa.name}ㅣ{aaa.code}{" "}
-                  </span>
-                  <CloseOutlined
-                    onClick={() => {
-                      Delete_Button(aaa.code);
-                    }}
-                  ></CloseOutlined>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      <div className="favorite_box">
+        <span className="favorite_title">내 관심종목</span>
+        <div className="favorite_input">
+          <Autocomplete
+            onChange={onCodeHandler}
+            options={Codedata}
+            getOptionLabel={(option) => option.name + "ㅣ" + option.code}
+            style={{ width: 225, margin: "0 auto" }}
+            renderInput={(params) => (
+              <TextField
+                label="관심종목을 선택하세요"
+                {...params}
+                margin="normal"
+              />
+            )}
+          />
+          <div>
+            <Button
+              onClick={() => {
+                favorite_Button();
+              }}
+              style={{ marginTop: "10px", marginBottom: "5px", width: "220px" }}
+            >
+              추가
+            </Button>
+          </div>
 
-        {fincode_redux_data ? (
-          <>
-            <div style={{ fontWeight: "600" }}>
-              종목명 : {fincode_redux_data}
-            </div>
-            <div className="vote">
-              <div
-                className="vote-inline-graph up"
-                style={{ width: `${total_UPpercent}%` }}
-              >
-                {total_UPpercent}%
-              </div>
-              <div
-                className="vote-inline-graph down"
-                style={{ width: `${total_Downpercent}%` }}
-              >
-                {total_Downpercent}%
-              </div>
-            </div>
-            <div className="favorite_btn_wrap">
-              {check === -1 ? (
-                <Button onClick={Up_Button}>상승타이밍</Button>
-              ) : (
-                <span></span>
-              )}
-              {minus_check === -1 ? (
-                <Button onClick={Down_Button}>하락타이밍</Button>
-              ) : (
-                <span></span>
-              )}
-            </div>
-            <Chart />
-          </>
-        ) : (
-          ""
-        )}
+          <div className="favorite_list">
+            {MyCode.map((aaa, index) => {
+              return (
+                <div key={index}>
+                  <div className="my_list">
+                    <span
+                      onClick={() => {
+                        finList_Button(aaa.name);
+                      }}
+                    >
+                      {aaa.name}({aaa.code}){" "}
+                    </span>
+                    <CloseOutlined
+                      onClick={() => {
+                        Delete_Button(aaa.code);
+                      }}
+                    ></CloseOutlined>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
+      {fincode_redux_data ? (
+        <>
+          <div style={{ fontWeight: "600" }}>종목명 : {fincode_redux_data}</div>
+          <div className="vote">
+            <div
+              className="vote-inline-graph up"
+              style={{ width: `${total_UPpercent}%` }}
+            >
+              {total_UPpercent}%
+              <span className="tooltiptext tooltip-bottom" onClick={Up_Button}>
+                {check ? "취소" : "클릭시 상승투표"}
+              </span>
+            </div>
+            <div
+              className="vote-inline-graph down"
+              style={{ width: `${total_Downpercent}%` }}
+            >
+              {total_Downpercent}%
+              <span
+                className="tooltiptext tooltip-bottom"
+                onClick={Down_Button}
+              >
+                {minus_check ? "취소" : "클릭시 하락투표"}
+              </span>
+            </div>
+          </div>
+          <div className="favorite_btn_wrap">
+            {check === -1 ? (
+              <Button onClick={Up_Button}>상승타이밍</Button>
+            ) : (
+              <span></span>
+            )}
+            {minus_check === -1 ? (
+              <Button onClick={Down_Button}>하락타이밍</Button>
+            ) : (
+              <span></span>
+            )}
+          </div>
+          <Chart />
+        </>
+      ) : (
+        ""
+      )}
+
       <br></br>
     </div>
   );

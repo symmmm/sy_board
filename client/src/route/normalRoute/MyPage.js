@@ -21,7 +21,13 @@ const MyPage = () => {
 
   useEffect(() => {
     axios
-      .get(SERVER_URI + "/board/search/작성자/" + UserName + "/0/0/1")
+      .post(SERVER_URI + "/board/search/", {
+        menuItem: "작성자",
+        value: UserName,
+        start_date: "0",
+        end_date: "0",
+        page: "1",
+      })
       .then((response) => {
         setmyData(response.data.docs);
         setpageTotal(response.data.totalDocs);
@@ -31,7 +37,13 @@ const MyPage = () => {
 
   const PageHandeler = (page) => {
     axios
-      .get(SERVER_URI + "/board/search/작성자/" + UserName + "/0/0/" + page)
+      .get(SERVER_URI + "/board/search/", {
+        menuItem: "작성자",
+        value: UserName,
+        start_date: "0",
+        end_date: "0",
+        page: page,
+      })
       .then((response) => {
         setmyData(response.data.docs);
         setpageTotal(response.data.totalDocs);

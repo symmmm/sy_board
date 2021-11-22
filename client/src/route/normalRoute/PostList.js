@@ -29,6 +29,7 @@ const PostList = () => {
   const [data, setData] = useState([]);
   const [pageTotal, setpageTotal] = useState("");
   const [getMenu, setMenu] = useState("제목");
+  const [getCategory, setCategory] = useState("전체글");
   const [interest, set_interest] = useState("");
   const [interest_total, set_interest_total] = useState("");
   const { SearchList, SelectMenu, searchValue, Reduxpage, Best_List } =
@@ -60,20 +61,17 @@ const PostList = () => {
     console.log("이펙트실행");
     if (SearchList) {
       axios
-        .get(
-          SERVER_URI +
-            "/board/search/" +
-            SelectMenu +
-            "/" +
-            searchValue +
-            "/0/0/" +
-            Reduxpage
-        )
+        .post(SERVER_URI + "/board/search/", {
+          menuItem: SelectMenu,
+          value: searchValue,
+          start_date: "0",
+          end_date: "0",
+          page: Reduxpage,
+        })
         .then((response) => {
-          //console.log("검색or관심종목클릭");
-          setData(response.data.docs);
-          setpageTotal(response.data.totalDocs);
-          const fin_list_code = response.data.docs.map(
+          setData(response.data?.docs);
+          setpageTotal(response?.data.totalDocs);
+          const fin_list_code = response?.data.docs.map(
             (v) => v.post_fin_list.code
           );
           axios
@@ -81,7 +79,7 @@ const PostList = () => {
               fin_code_list: fin_list_code,
             })
             .then((res) => {
-              const int_v = res.data.countBoard.map((a) => a.fin_count);
+              const int_v = res.data?.countBoard.map((a) => a.fin_count);
               set_interest(int_v);
               set_interest_total(res.data.countBoard[0]?.total_count);
             });
@@ -181,18 +179,16 @@ const PostList = () => {
     dispatch(pageupdate(page));
     if (SearchList) {
       axios
-        .get(
-          SERVER_URI +
-            "/board/search/" +
-            SelectMenu +
-            "/" +
-            searchValue +
-            "/0/0/" +
-            page
-        )
+        .post(SERVER_URI + "/board/search/", {
+          menuItem: SelectMenu,
+          value: searchValue,
+          start_date: "0",
+          end_date: "0",
+          page: page,
+        })
         .then((response) => {
-          setpageTotal(response.data.totalDocs);
-          setData(response.data.docs);
+          setpageTotal(response.data?.totalDocs);
+          setData(response.data?.docs);
         });
     } else {
       axios.get(SERVER_URI + "/board/list/" + page).then((response) => {
@@ -222,10 +218,16 @@ const PostList = () => {
       alert("검색어를 입력해주세요");
     } else if (value.length <= 15) {
       axios
-        .get(SERVER_URI + "/board/search/" + getMenu + "/" + value + "/0/0/1")
+        .post(SERVER_URI + "/board/search/", {
+          menuItem: getMenu,
+          value: value,
+          start_date: "0",
+          end_date: "0",
+          page: "1",
+        })
         .then((response) => {
-          setData(response.data.docs);
-          setpageTotal(response.data.totalDocs);
+          setData(response.data?.docs);
+          setpageTotal(response.data?.totalDocs);
           dispatch(PageSearch(getMenu, value));
           axios
             .post(SERVER_URI + "/search_log/save", {
@@ -233,7 +235,7 @@ const PostList = () => {
               Search_Value: value,
             })
             .then((res) => {
-              console.log(res.data);
+              console.log(res?.data);
             });
         });
     } else {
@@ -252,10 +254,23 @@ const PostList = () => {
     window.scrollTo(0, 0);
   };
 
-  function handleMenuClick(e) {
-    console.log(e.key);
-    setMenu(e.key);
+  const [click_auth, set_click_auth] = useState();
+  function auth_Click(value) {
+    set_click_auth(value);
   }
+  function auth_MenuClick() {
+    dispatch(PageSearch("작성자", click_auth));
+  }
+  function fincode_Click(value) {
+    dispatch(PageSearch("종목명", value));
+  }
+  const auth_menu = (
+    <Menu>
+      <Menu.Item key="작성자" onClick={auth_MenuClick}>
+        작성글 보기
+      </Menu.Item>
+    </Menu>
+  );
   const menu = (
     <Menu onClick={handleMenuClick}>
       <Menu.Item key="제목">제목</Menu.Item>
@@ -265,22 +280,15 @@ const PostList = () => {
       <Menu.Item key="종목코드">종목코드</Menu.Item>
     </Menu>
   );
-  const [click_auth, set_click_auth] = useState();
-  function auth_Click(value) {
-    set_click_auth(value);
+  function handleMenuClick(e) {
+    console.log(e.key);
+    setMenu(e.key);
   }
-  function auth_MenuClick() {
-    dispatch(PageSearch("작성자", click_auth));
+  function handleCategoryClick(e) {
+    console.log(e.key);
+    setCategory(e.key);
   }
-  const auth_menu = (
-    <Menu>
-      <Menu.Item key="작성자" onClick={auth_MenuClick}>
-        작성글 보기
-      </Menu.Item>
-    </Menu>
-  );
-
-  const best = () => {
+  const best = (e) => {
     dispatch(update_best("추천수"));
     dispatch(pageupdate(1));
     window.scrollTo(0, 0);
@@ -295,17 +303,26 @@ const PostList = () => {
     dispatch(pageupdate(1));
     window.scrollTo(0, 0);
   };
-  const [Show_history, set_Show_history] = useState(false);
-  // const onFocus = () => {
-  //   console.log("히스토리");
-  //   set_Show_history(true);
-  // };
 
-  // useOutsideClick(ref, () => {
-  //   //console.log(ref);
-  //   console.log("ref함수");
-  //   if (Show_history) set_Show_history(false);
-  // });
+  const category_menu = (
+    <Menu onClick={handleCategoryClick}>
+      <Menu.Item key="전체글" onClick={HomeButton}>
+        전체글
+      </Menu.Item>
+      <Menu.Item key="추천수" onClick={best}>
+        추천수
+      </Menu.Item>
+      <Menu.Item key="조회수" onClick={best_count}>
+        조회수
+      </Menu.Item>
+      <Menu.Item key="인기종목" onClick={best_fin}>
+        인기종목
+      </Menu.Item>
+    </Menu>
+  );
+
+  ///////////////검색내역
+  const [Show_history, set_Show_history] = useState(false);
   const search_click = (e) => {
     //console.log("타켓", ref.current.contains(e.target));
     //console.log("인풋포커스", search_ref.current.state.focused);
@@ -324,25 +341,13 @@ const PostList = () => {
     };
   }, []);
 
-  const category_menu = (
-    <Menu>
-      <Menu.Item key="추천수" onClick={best}>
-        추천수
-      </Menu.Item>
-      <Menu.Item key="조회수" onClick={best_count}>
-        조회수
-      </Menu.Item>
-      <Menu.Item key="인기종목" onClick={best_fin}>
-        인기종목
-      </Menu.Item>
-    </Menu>
-  );
   return (
     <div className="Main_LIST">
       <Table>
         <colgroup>
           <col width="10%" />
-          <col width="50%" />
+          <col width="15%" />
+          <col width="35%" />
           <col width="10%" />
           <col width="8%" />
           <col width="8%" />
@@ -352,7 +357,8 @@ const PostList = () => {
         <thead>
           <tr>
             <th>번호</th>
-            <th>제목</th>
+            <th>{""}</th>
+            <th style={{ textAlign: "left", paddingLeft: "100px" }}>제목</th>
             <th>작성자</th>
             <th>작성일</th>
             <th>조회수</th>
@@ -370,14 +376,26 @@ const PostList = () => {
                 <td>{user.post_num}</td>
               )}
               <td>
+                <span
+                  className="list_fincodename"
+                  onClick={() => {
+                    fincode_Click(user.post_fin_list.name);
+                  }}
+                >
+                  {user.post_fin_list.name}
+                </span>
+              </td>
+              <td style={{ textAlign: "left", paddingLeft: "50px" }}>
                 <Link to={`/posts/${user._id}?page=${Reduxpage}`}>
-                  [{user.post_fin_list.name}]{user.post_title} [
-                  {user.post_comment.length}]
+                  {user.post_title} [{user.post_comment.length}]
                 </Link>
               </td>
               <td>
                 <Dropdown overlay={auth_menu} trigger={["click"]}>
-                  <span onClick={() => auth_Click(user.post_author)}>
+                  <span
+                    style={{ cursor: "pointer" }}
+                    onClick={() => auth_Click(user.post_author)}
+                  >
                     {user.post_author}
                   </span>
                 </Dropdown>
@@ -409,11 +427,13 @@ const PostList = () => {
       </Table>
       <div className="page_box">
         <div>
-          <Button style={{ marginRight: "2px" }} onClick={HomeButton}>
+          {/* <Button style={{ marginRight: "2px" }} onClick={HomeButton}>
             전체글
-          </Button>
+          </Button> */}
           <Dropdown overlay={category_menu} trigger="click">
-            <Button>인기글</Button>
+            <Button>
+              {getCategory} <DownOutlined />
+            </Button>
           </Dropdown>
         </div>
 

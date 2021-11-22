@@ -5,6 +5,11 @@ div {
   font-family: "Noto Sans KR" !important;
 }
 
+thead {
+  background-color: #eaeaea;
+  border-top: 3px solid #ff6d00;
+}
+
 th,
 td {
   font-size: 50;
@@ -138,16 +143,15 @@ a:hover {
 }
 .favorite_list {
   word-break: break-all;
-  border: 1px solid #dadada;
   height: auto;
   box-sizing: border-box;
   overflow-y: auto;
   min-height: 100px;
   max-height: 200px;
   width: 250px;
-  background-color: #f5f0f0;
   margin-top: 5px;
   margin-bottom: 5px;
+  margin: 0 auto;
 }
 .Commentsbody {
   text-align: left;
@@ -156,7 +160,7 @@ a:hover {
 }
 .vote {
   border-color: black;
-
+  margin: 0 auto;
   border-width: thin;
   width: 250px;
   margin-top: 5px;
@@ -175,10 +179,54 @@ a:hover {
   max-width: 90%;
   min-width: 10%;
   font-size: 8px;
+  position: relative;
+}
+.vote-inline-graph.up .tooltiptext,
+.vote-inline-graph.down .tooltiptext {
+  visibility: hidden; /* 이벤트가 없으면 툴팁 영역을 숨김 */
+  width: 120px; /* 툴팁 영역의 넓이를 설정 */
+  cursor: pointer;
+  background-color: white;
+  color: black;
+  font-size: 13px;
+  text-align: center;
+  border-radius: 6px;
+  border: 1px solid #444444;
+  padding: 5px 0;
+  position: absolute; /* 절대 위치를 사용 */
+  left: 0px;
+  top: 0px;
+  z-index: 1;
+}
+.vote-inline-graph.up:hover .tooltiptext,
+.vote-inline-graph.down:hover .tooltiptext {
+  visibility: visible; /* hover 이벤트 발생시 영역을 보여줌 */
+}
+.vote-inline-graph.up .tooltiptext::after,
+.vote-inline-graph.down .tooltiptext::after {
+  content: " "; /* 정사각형 영역 사용 */
+  position: absolute; /* 절대 위치 사용 */
+  border-style: solid;
+  border-width: 5px; /* 테두리 넓이를 5px 로 설정 */
+}
+.vote-inline-graph.up .tooltip-bottom,
+.vote-inline-graph.down .tooltip-bottom {
+  width: 120px;
+  top: 100%;
+  left: 50%;
+  margin-left: -60px;
+}
+.vote-inline-graph.up .tooltip-bottom::after,
+.vote-inline-graph.down .tooltip-bottom::after {
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-color: transparent transparent white transparent;
 }
 
 .vote-inline-graph.down {
   background-color: rgba(27, 33, 47);
+  position: relative;
   max-width: 90%;
   min-width: 10%;
   font-size: 8px;
@@ -297,6 +345,13 @@ a:hover {
   width: 270px;
   margin-left: 20px;
   text-align: center;
+  /* border: 1px solid rgba(218, 218, 218); */
+}
+.favorite_box {
+  border: 1px solid rgba(218, 218, 218);
+  margin-bottom: 15px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .main1 {
@@ -551,13 +606,25 @@ a:hover {
 }
 .my_list {
   cursor: pointer;
+  font-size: 15px;
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: left;
+  margin-left: 14px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 .my_list:hover {
   font-weight: 600;
+}
+.MuiFormControl-marginNormal {
+  margin: 0 !important;
+}
+.my_list > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .commnet_count {
   margin-left: 5px;
@@ -687,6 +754,7 @@ a:hover {
   .ant-pagination-item-link-icon {
   color: black;
 }
+
 .favorite_check_div {
   display: flex;
   flex-direction: row;
@@ -748,4 +816,12 @@ a:hover {
   margin-left: 3px;
   font-weight: 300;
   font-size: 13px;
+}
+.list_fincodename {
+  color: rgba(236, 106, 23);
+  cursor: pointer;
+}
+.favorite_title {
+  font-size: 16px;
+  font-weight: 500;
 }

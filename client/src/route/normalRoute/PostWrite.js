@@ -247,9 +247,7 @@ function PostWrite() {
         ) : (
           <div style={{ display: "flex", height: "30px" }}>
             <div
-              className="vote"
               style={{
-                marginTop: "-9px",
                 width: "250px",
                 height: "34px",
               }}
